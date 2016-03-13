@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.jb.vmeeting.app.constant.IntentConstant;
+import com.jb.vmeeting.ui.utils.PageJumper;
 
 
 /**
@@ -24,7 +25,7 @@ public class BaseActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (null != intent) {
             mBundle = intent.getBundleExtra(IntentConstant.INTENT_EXTRA_BUNDLE);
-            fetchIntent(intent, mBundle);
+            onFetchIntent(intent, mBundle);
         }
     }
 
@@ -58,25 +59,12 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    protected void fetchIntent(Intent intent, Bundle bundle) {
+    protected void onFetchIntent(Intent intent, Bundle bundle) {
 
     }
 
     protected Bundle getBundle() {
         return mBundle;
-    }
-
-    protected void toActivity(Class clazz) {
-        Intent intent = new Intent();
-        intent.setClass(this, clazz);
-        startActivity(intent);
-    }
-
-    protected void toActivity(Class clazz, Bundle bundle) {
-        Intent intent = new Intent();
-        intent.setClass(this, clazz);
-        intent.putExtra(IntentConstant.INTENT_EXTRA_BUNDLE, bundle);
-        startActivity(intent);
     }
 
     @SuppressWarnings("unchecked")

@@ -3,6 +3,8 @@ package com.jb.vmeeting.tools;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.jb.vmeeting.utils.SystemUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,15 +98,14 @@ public final class L {
                 String message;
                 if(json.startsWith("{")) {
                     JSONObject e1 = new JSONObject(json);
-                    message = e1.toString(4);
+                    message = "JSON:" + SystemUtils.getLineProperty() + e1.toString(4);
                     Log.d(tag, message);
-                    return;
-                }
-
-                if(json.startsWith("[")) {
+                } else if(json.startsWith("[")) {
                     JSONArray e = new JSONArray(json);
-                    message = e.toString(4);
+                    message = "JSON:" + SystemUtils.getLineProperty() + e.toString(4);
                     Log.d(tag, message);
+                } else {
+                    Log.e(tag, "Error json content");
                 }
             } catch (JSONException var4) {
                 Log.e(tag, var4.getCause().getMessage() + "\n" + json);

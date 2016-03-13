@@ -1,4 +1,4 @@
-package com.jb.vmeeting.tools;
+package com.jb.vmeeting.tools.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;

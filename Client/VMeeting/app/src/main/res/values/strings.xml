@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">VMeeting</string>
     <string name="action_settings">Settings</string>
+
+    <!-- tip message -->
+    <string name="no_access">not login</string>
+
+    <!--activity title name-->
+    <string name="title_login">Login</string>
 </resources>

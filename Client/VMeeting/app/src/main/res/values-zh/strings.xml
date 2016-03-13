@@ -2,4 +2,11 @@
 <resources>
     <string name="app_name">视频会议</string>
     <string name="action_settings">设置</string>
+
+    <!-- tip message -->
+    <string name="no_access">未登录</string>
+
+    <!--activity title name-->
+    <string name="title_login">登录</string>
+
 </resources>
