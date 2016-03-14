@@ -1,4 +1,4 @@
-package com.jb.vmeeting.ui.activity;
+package com.jb.vmeeting.page.activity;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -10,8 +10,8 @@ import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.presenter.LoginPresenter;
 import com.jb.vmeeting.mvp.view.ILoginView;
 import com.jb.vmeeting.tools.L;
-import com.jb.vmeeting.ui.base.BaseActivity;
-import com.jb.vmeeting.ui.utils.ToastUtil;
+import com.jb.vmeeting.page.base.BaseActivity;
+import com.jb.vmeeting.page.utils.ToastUtil;
 
 /**
  * 登录页面

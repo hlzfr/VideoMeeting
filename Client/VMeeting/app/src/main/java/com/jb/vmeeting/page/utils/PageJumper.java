@@ -1,4 +1,4 @@
-package com.jb.vmeeting.ui.utils;
+package com.jb.vmeeting.page.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.jb.vmeeting.app.constant.IntentConstant;
-import com.jb.vmeeting.ui.activity.LoginActivity;
-import com.jb.vmeeting.ui.activity.MainActivity;
-import com.jb.vmeeting.ui.activity.SignUpActivity;
+import com.jb.vmeeting.page.activity.LoginActivity;
+import com.jb.vmeeting.page.activity.MainActivity;
+import com.jb.vmeeting.page.activity.SignUpActivity;
 
 /**
  * 页面跳转

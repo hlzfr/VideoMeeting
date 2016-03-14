@@ -1,4 +1,4 @@
-package com.jb.vmeeting.ui.utils;
+package com.jb.vmeeting.page.utils;
 
 import android.widget.Toast;
 

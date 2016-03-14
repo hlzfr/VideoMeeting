@@ -8,8 +8,8 @@ import com.jb.vmeeting.mvp.model.eventbus.event.LoginEvent;
 import com.jb.vmeeting.mvp.model.eventbus.event.SignUpEvent;
 import com.jb.vmeeting.mvp.model.helper.AuthCookie;
 import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
-import com.jb.vmeeting.ui.utils.PageJumper;
-import com.jb.vmeeting.ui.utils.ToastUtil;
+import com.jb.vmeeting.page.utils.PageJumper;
+import com.jb.vmeeting.page.utils.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
 

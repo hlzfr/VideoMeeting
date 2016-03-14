@@ -1,16 +1,14 @@
-package com.jb.vmeeting.ui.activity;
+package com.jb.vmeeting.page.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.jb.vmeeting.R;
-import com.jb.vmeeting.ui.base.BaseActivity;
-import com.jb.vmeeting.ui.utils.PageJumper;
+import com.jb.vmeeting.page.base.BaseActivity;
+import com.jb.vmeeting.page.utils.PageJumper;
 
 public class MainActivity extends BaseActivity {
 

@@ -1,4 +1,4 @@
-package com.jb.vmeeting.ui.base;
+package com.jb.vmeeting.page.base;
 
 import android.content.Intent;
 import android.os.Bundle;
