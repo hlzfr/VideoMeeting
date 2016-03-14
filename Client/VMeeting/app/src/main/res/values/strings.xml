@@ -7,4 +7,11 @@
 
     <!--activity title name-->
     <string name="title_login">Login</string>
+    <string name="title_sign_up">Sign Up</string>
+
+
+    <!-- text on view -->
+    <string name="text_login">Login</string>
+    <string name="text_sign_up">Sign Up</string>
+
 </resources>

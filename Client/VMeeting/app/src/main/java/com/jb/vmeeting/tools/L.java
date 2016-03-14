@@ -90,7 +90,6 @@ public final class L {
     }
 
     public static void printJson(String tag, String json) {
-        // TODO 输出格式不美观
         if(TextUtils.isEmpty(json)) {
             Log.e(tag, "Empty/Null json content");
         } else {

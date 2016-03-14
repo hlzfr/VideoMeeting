@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.jb.vmeeting.app.constant.IntentConstant;
-import com.jb.vmeeting.ui.utils.PageJumper;
 
 
 /**
@@ -23,9 +22,22 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        handleIntent(intent);
+        initViews();
+        setupListener();
+    }
+
+    @CallSuper
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
         if (null != intent) {
             mBundle = intent.getBundleExtra(IntentConstant.INTENT_EXTRA_BUNDLE);
-            onFetchIntent(intent, mBundle);
+            onHandleIntent(intent, mBundle);
         }
     }
 
@@ -59,7 +71,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    protected void onFetchIntent(Intent intent, Bundle bundle) {
+    protected void onHandleIntent(Intent intent, Bundle bundle) {
 
     }
 
@@ -70,5 +82,14 @@ public class BaseActivity extends AppCompatActivity {
     @SuppressWarnings("unchecked")
     public <T extends View> T findView(int id) {
         return (T) super.findViewById(id);
+    }
+
+    protected void initViews() {
+
+
+    }
+
+    protected void setupListener() {
+
     }
 }

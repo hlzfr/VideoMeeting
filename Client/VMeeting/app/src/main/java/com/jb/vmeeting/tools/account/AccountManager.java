@@ -2,12 +2,16 @@ package com.jb.vmeeting.tools.account;
 
 import com.jb.vmeeting.R;
 import com.jb.vmeeting.app.App;
-import com.jb.vmeeting.network.apiservice.AccountService;
-import com.jb.vmeeting.network.entity.User;
-import com.jb.vmeeting.network.helper.AuthCookie;
-import com.jb.vmeeting.network.helper.RetrofitHelper;
+import com.jb.vmeeting.mvp.model.apiservice.AccountService;
+import com.jb.vmeeting.mvp.model.entity.User;
+import com.jb.vmeeting.mvp.model.eventbus.event.LoginEvent;
+import com.jb.vmeeting.mvp.model.eventbus.event.SignUpEvent;
+import com.jb.vmeeting.mvp.model.helper.AuthCookie;
+import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
 import com.jb.vmeeting.ui.utils.PageJumper;
 import com.jb.vmeeting.ui.utils.ToastUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,27 +53,34 @@ public class AccountManager {
                 User user = response.body();
                 if (user != null) {
                     sCurrentUser = user;
-                    // TODO save user in local and post login success event
+                    // TODO save user in local
+
+                    // post login success event
+                    EventBus.getDefault().post(new LoginEvent(true, "login success", user));
+                } else {
+                    EventBus.getDefault().post(new LoginEvent(false, "empty user", null));
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                // TODO post login failed event
+                EventBus.getDefault().post(new LoginEvent(false, t.getMessage(), null));
             }
         });
     }
 
-    public void register(String username, String password) {
-        mAccountService.register(username, password).enqueue(new Callback<Void>() {
+    public void signUp(String username, String password) {
+        mAccountService.signUp(username, password).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                // TODO post register success event
+                //TODO check success or not
+                EventBus.getDefault().post(new SignUpEvent(true, "sign up success!"));
+
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                // TODO post register failed event
+                EventBus.getDefault().post(new SignUpEvent(false, "sign up failed." + t.getMessage()));
             }
         });
     }

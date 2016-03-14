@@ -1,4 +1,4 @@
-package com.jb.vmeeting.network.helper;
+package com.jb.vmeeting.mvp.model.helper;
 
 import java.io.IOException;
 import java.util.List;

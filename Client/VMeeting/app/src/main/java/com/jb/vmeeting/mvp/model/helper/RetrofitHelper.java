@@ -1,4 +1,4 @@
-package com.jb.vmeeting.network.helper;
+package com.jb.vmeeting.mvp.model.helper;
 
 import com.jb.vmeeting.app.constant.URLConstant;
 
@@ -10,6 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Jianbin on 2016/2/17.
  */
 public class RetrofitHelper {
+
     static class RetrofitHolder{
         public static final Retrofit INSTANCE = buildInstance();
         public static Retrofit buildInstance () {

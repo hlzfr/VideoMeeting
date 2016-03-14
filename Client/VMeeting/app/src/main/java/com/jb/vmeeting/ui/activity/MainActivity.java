@@ -9,9 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.jb.vmeeting.R;
-import com.jb.vmeeting.network.entity.User;
-import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.ui.base.BaseActivity;
+import com.jb.vmeeting.ui.utils.PageJumper;
 
 public class MainActivity extends BaseActivity {
 
@@ -21,15 +20,14 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+    public void toSignUpActivity(View view) {
+        PageJumper.getInstance().toSignUpActivity(this);
+    }
+
+    public void toLoginActivity(View view) {
+        PageJumper.getInstance().toLoginActivity(this);
     }
 
     @Override

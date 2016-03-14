@@ -65,8 +65,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             // 测试环境
             if (mDefaultCrashHandler != null) {
                 mDefaultCrashHandler.uncaughtException(thread, throwable);
-            } else {
-                Process.killProcess(Process.myPid());
+//            } else {
+//                Process.killProcess(Process.myPid());
             }
         } else {
             // 正式环境
@@ -112,7 +112,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             pw.println();
             throwable.printStackTrace(pw);
             pw.close();
-            L.i("dump success");
+            L.i("dump success."+throwable.getMessage());
         } catch (Exception e) {
             L.e("dump crash info failed: " + e.getMessage());
         }

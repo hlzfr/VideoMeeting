@@ -1,4 +1,4 @@
-package com.jb.vmeeting.network.entity;
+package com.jb.vmeeting.mvp.model.entity;
 
 import com.google.gson.annotations.Expose;
 

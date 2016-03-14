@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import com.jb.vmeeting.app.constant.IntentConstant;
 import com.jb.vmeeting.ui.activity.LoginActivity;
 import com.jb.vmeeting.ui.activity.MainActivity;
+import com.jb.vmeeting.ui.activity.SignUpActivity;
 
 /**
  * 页面跳转
@@ -25,6 +26,10 @@ public class PageJumper {
 
     public void toLoginActivity(@NonNull Context ctx) {
         toActivity(ctx, LoginActivity.class);
+    }
+
+    public void toSignUpActivity(@NonNull Context ctx) {
+        toActivity(ctx, SignUpActivity.class);
     }
 
     private void toActivity(@NonNull Context ctx, @NonNull Class clazz) {
