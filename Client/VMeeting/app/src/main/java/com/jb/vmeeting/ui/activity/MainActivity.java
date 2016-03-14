@@ -13,10 +13,6 @@ import com.jb.vmeeting.network.entity.User;
 import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.ui.base.BaseActivity;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 public class MainActivity extends BaseActivity {
 
     @Override
