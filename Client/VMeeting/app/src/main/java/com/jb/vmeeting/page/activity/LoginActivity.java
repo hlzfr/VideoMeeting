@@ -57,7 +57,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     @Override
     public void onLoginSuccess(User user) {
         //TODO cancel login waiting view
-//        PageJumper.getInstance().toMainActivity(this);
+//        PageNavigator.getInstance().toMainActivity(this);
 //        finish();
         ToastUtil.toast("login success!");
         L.d("login success.");

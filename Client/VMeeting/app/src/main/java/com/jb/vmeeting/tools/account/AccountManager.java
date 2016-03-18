@@ -8,7 +8,7 @@ import com.jb.vmeeting.mvp.model.eventbus.event.LoginEvent;
 import com.jb.vmeeting.mvp.model.eventbus.event.SignUpEvent;
 import com.jb.vmeeting.mvp.model.helper.AuthCookie;
 import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
-import com.jb.vmeeting.page.utils.PageJumper;
+import com.jb.vmeeting.page.utils.PageNavigator;
 import com.jb.vmeeting.page.utils.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -96,7 +96,7 @@ public class AccountManager {
                 ToastUtil.toast(R.string.no_access);
             }
             if (toLoginPageIfNotLogin) {
-                PageJumper.getInstance().toLoginActivity(App.getInstance());
+                PageNavigator.getInstance().toLoginActivity(App.getInstance());
             }
         }
         return hasLogin;

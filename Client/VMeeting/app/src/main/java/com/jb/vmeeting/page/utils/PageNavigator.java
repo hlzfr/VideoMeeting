@@ -11,13 +11,13 @@ import com.jb.vmeeting.page.activity.MainActivity;
 import com.jb.vmeeting.page.activity.SignUpActivity;
 
 /**
- * 页面跳转
+ * 页面跳转导航
  * Created by Jianbin on 2016/3/13.
  */
-public class PageJumper {
+public class PageNavigator {
 
-    public static PageJumper getInstance() {
-        return SingleHolder.sPageJumper;
+    public static PageNavigator getInstance() {
+        return SingleHolder.sPageNavigator;
     }
 
     public void toMainActivity(@NonNull Context ctx) {
@@ -46,7 +46,7 @@ public class PageJumper {
     }
 
     private static final class SingleHolder {
-        private static PageJumper sPageJumper = new PageJumper();
+        private static PageNavigator sPageNavigator = new PageNavigator();
     }
 
 }

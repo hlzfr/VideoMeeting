@@ -10,6 +10,11 @@ public class LoginEvent {
     public String msg;
     public User user;
 
+    /**
+     * @param success login success or not
+     * @param msg shows the err message. not empty only when success is false.
+     * @param user not null only when success is true.
+     */
     public LoginEvent(boolean success, String msg, User user) {
         this.success = success;
         this.msg = msg;

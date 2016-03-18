@@ -8,7 +8,7 @@ import android.view.View;
 
 import com.jb.vmeeting.R;
 import com.jb.vmeeting.page.base.BaseActivity;
-import com.jb.vmeeting.page.utils.PageJumper;
+import com.jb.vmeeting.page.utils.PageNavigator;
 
 public class MainActivity extends BaseActivity {
 
@@ -21,11 +21,11 @@ public class MainActivity extends BaseActivity {
     }
 
     public void toSignUpActivity(View view) {
-        PageJumper.getInstance().toSignUpActivity(this);
+        PageNavigator.getInstance().toSignUpActivity(this);
     }
 
     public void toLoginActivity(View view) {
-        PageJumper.getInstance().toLoginActivity(this);
+        PageNavigator.getInstance().toLoginActivity(this);
     }
 
     @Override
