@@ -83,7 +83,7 @@ public class AccountManager {
     }
 
     public boolean checkLogin() {
-        return getAccountSession().getCurrentUser() != null;
+        return getAccountSession().hasLogin();
     }
 
     public boolean checkLogin(boolean toLoginPageIfNotLogin, boolean toastMessageIfNotLogin) {

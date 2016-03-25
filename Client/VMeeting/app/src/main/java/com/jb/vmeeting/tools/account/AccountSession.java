@@ -29,7 +29,21 @@ public class AccountSession {
      * @return
      */
     public User getCurrentUser() {
-        return mCurrentUser == null ? null : mCurrentUser.clone();
+        User user = getUser();
+        return user == null ? null : user.clone();
+    }
+
+    /**
+     * 获取已登录的用户，不对外开放
+     * @return
+     */
+    private User getUser() {
+        //TODO try to get from local if user don't exist in memory
+        return mCurrentUser;
+    }
+
+    public boolean hasLogin() {
+        return getUser() != null;
     }
 
     private final static class SingletonHolder {
