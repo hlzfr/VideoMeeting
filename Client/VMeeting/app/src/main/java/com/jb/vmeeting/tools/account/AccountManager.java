@@ -18,11 +18,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * 帐号相关管理
+ * 帐号相关管理，用于执行帐号相关操作
+ *
  * Created by Jianbin on 2016/3/13.
  */
 public class AccountManager {
-    private static User sCurrentUser;
 
     // 帐号相关的网络请求
     private AccountService mAccountService;
@@ -35,13 +35,12 @@ public class AccountManager {
         mAccountService = RetrofitHelper.createService(AccountService.class);
     }
 
-    public User currentUser() {
-        // TODO return current user in memory or storage
-        return sCurrentUser;
+    public AccountSession getAccountSession() {
+        return AccountSession.getAccountSession();
     }
 
     public void logout() {
-        sCurrentUser = null;
+        AccountSession.getAccountSession().setCurrentUser(null);
         AuthCookie.clear();
         mAccountService.logout().enqueue(null);
     }
@@ -52,9 +51,7 @@ public class AccountManager {
             public void onResponse(Call<User> call, Response<User> response) {
                 User user = response.body();
                 if (user != null) {
-                    sCurrentUser = user;
-                    // TODO save user in local
-
+                    AccountSession.getAccountSession().setCurrentUser(user);
                     // post login success event
                     EventBus.getDefault().post(new LoginEvent(true, "login success", user));
                 } else {
@@ -86,7 +83,7 @@ public class AccountManager {
     }
 
     public boolean checkLogin() {
-        return currentUser() != null;
+        return getAccountSession().getCurrentUser() != null;
     }
 
     public boolean checkLogin(boolean toLoginPageIfNotLogin, boolean toastMessageIfNotLogin) {

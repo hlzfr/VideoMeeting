@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Created by Jianbin on 2016/3/13.
  */
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Cloneable{
 
     @Expose
     private String nickName; // 昵称，用于显示给其他用户看的
@@ -27,5 +27,15 @@ public class User extends BaseEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public User clone() {
+        User user = null;
+        try {
+            user = (User) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 }
