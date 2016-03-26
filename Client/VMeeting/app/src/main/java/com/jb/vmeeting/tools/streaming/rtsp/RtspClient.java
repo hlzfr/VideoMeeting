@@ -6,13 +6,19 @@ import android.os.Looper;
 
 import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.tools.streaming.Session;
+import com.jb.vmeeting.tools.streaming.Stream;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Rtsp客户端，和EasyDarwin流媒体服务器对应
@@ -21,12 +27,20 @@ import java.util.concurrent.Semaphore;
  * Created by Jianbin on 2016/3/25.
  */
 public class RtspClient {
-    // ------ 当前客户端的连接状态以及媒体流的传输行为 ------- //
+
+    // ------ 当前客户端的连接状态以及媒体流的传输行为 -------
     private final static int STATE_STARTED  = 0x00;  // 开始传输媒体流
     private final static int STATE_STARTING = 0x01;  // 正在连接服务端
     private final static int STATE_STOPPING = 0x02;  // 正在断开服务端
     private final static int STATE_STOPPED  = 0x03;  // 已经停止流传输
-    // ------------------------------------------------------- //
+
+    // --------------------- 结果回调消息通知 ----------------
+    public final static int ERROR_CONNECTION_FAILED = 0x01; //  与服务端连接失败
+    public final static int ERROR_WRONG_CREDENTIALS = 0x03; // 错误的身份验证(没有权限)
+    public final static int ERROR_CONNECTION_LOST   = 0x04; // 与服务端丢失连接
+
+    public final static int MESSAGE_CONNECTION_RECOVERED = 0x05; // 与服务端连接恢复
+    // -------------------------------------------------------
 
 
     private int mState = STATE_STARTED; // 当前客户端与服务端的连接状态
@@ -116,8 +130,8 @@ public class RtspClient {
                 try {
                     tryConnection();
                 } catch (Exception e) {
-                    //TODO 发送连接失败消息
-//                    postError(ERROR_CONNECTION_FAILED, e);
+                    // 发送连接失败消息
+                    postError(ERROR_CONNECTION_FAILED, e);
                     abord();
                     return;
                 }
@@ -160,24 +174,84 @@ public class RtspClient {
         sendRequestPlay();
     }
 
-    private void sendRequestAnnounce() {
-        // TODO
+    private void sendRequestAnnounce() throws IOException, IllegalStateException, SocketException{
+        String body = mParameters.session.getSessionDescription();
+        String request = "ANNOUNCE rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
+                "CSeq: " + (++mCSeq) + "\r\n" +
+                "Content-Length: " + body.length() + "\r\n" +
+                "Content-Type: application/sdp \r\n\r\n" +
+                body;
+        L.i(request.substring(0, request.indexOf("\r\n")));
+
+        mOutputStream.write(request.getBytes("UTF-8"));
+        Response response = Response.parseResponse(mBufferedReader);
+
+        if (response.headers.containsKey("server")) {
+            L.v("RTSP server name:" + response.headers.get("server"));
+        } else {
+            L.v("RTSP server name unknown");
+        }
+
+        if (response.status == 401) {
+            throw new RuntimeException("Bad credentials !");
+        } else if (response.status == 403) {
+            throw new RuntimeException("Access forbidden !");
+        }
     }
 
-    private void sendRequestSetUp() {
-        // TODO
+    private void sendRequestSetUp() throws IOException, IllegalStateException, SocketException{
+        for (int i=0;i<2;i++) {
+            Stream stream = mParameters.session.getTrack(i);
+            if (stream != null) {
+                String request = "SETUP rtsp://" + mParameters.host + ":" + mParameters.port + mParameters.path + "/trackID=" + i + " RTSP/1.0\r\n" +
+                        "CSeq: " + (++mCSeq) + "\r\n" +
+                        "User-Agent: Android\r\n"+
+                        "Transport: RTP/AVP/TCP;unicast;mode=record;interleaved=" + (i) + "-" + (i + 1) + "\r\n\r\n";
+
+                L.i(request.substring(0, request.indexOf("\r\n")));
+
+                mOutputStream.write(request.getBytes("UTF-8"));
+                Response response = Response.parseResponse(mBufferedReader);
+                try {
+                    Matcher sessionMatcher = Response.rexegSession.matcher(response.headers.get("session"));
+                    sessionMatcher.find();
+                    mSessionID = sessionMatcher.group(1);
+                    L.d("getSession id " + mSessionID);
+                } catch (Exception e) {
+                    throw new IOException("Invalid response from server. Session id: " + mSessionID);
+                }
+            }
+        }
     }
 
-    private void sendRequestPlay() {
-        // TODO
+    private void sendRequestPlay() throws IOException, IllegalStateException, SocketException{
+        String request = "PLAY rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
+                "CSeq: " + (++mCSeq) + "\r\n"+
+                "User-Agent: Android\r\n"+
+                "Session: "+mSessionID+"\r\n"+
+                "Range: npt=0.000-\r\n\r\n";
+        L.i(request.substring(0, request.indexOf("\r\n")));
+        mOutputStream.write(request.getBytes("UTF-8"));
+        Response.parseResponse(mBufferedReader);
     }
 
     private void sendRequestOption() throws IOException{
-        // TODO
+        String request = "OPTIONS rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
+                "CSeq: " + (++mCSeq) + "\r\n" +
+                "Content-Length: 0\r\n" +
+                "Session: " + mSessionID + "\r\n";
+        L.i(request.substring(0, request.indexOf("\r\n")));
+        mOutputStream.write(request.getBytes("UTF-8"));
+        Response.parseResponse(mBufferedReader);
     }
 
-    private void sendRequestTeardown() {
-        // TODO
+    private void sendRequestTeardown() throws IOException {
+        String request = "TEARDOWN rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
+                "CSeq: " + (++mCSeq) + "\r\n" +
+                "Content-Length: 0\r\n" +
+                "Session: " + mSessionID + "\r\n";
+        L.i(request.substring(0, request.indexOf("\r\n")));
+        mOutputStream.write(request.getBytes("UTF-8"));
     }
     public boolean isStreaming() {
         return mState==STATE_STARTED|mState==STATE_STARTING;
@@ -208,8 +282,8 @@ public class RtspClient {
                     mAsyHandler.postDelayed(mConnectionMonitor, 6000);
                 } catch (IOException e) {
                     // OPTION 请求失败
-                    //TODO　发送连接丢失消息
-//                    postMessage(ERROR_CONNECTION_LOST);
+                    // 发送连接丢失消息
+                    postMessage(ERROR_CONNECTION_LOST);
                     L.e("Connection lost with the server...");
                     // 停止流传输
                     mParameters.session.stop();
@@ -230,12 +304,13 @@ public class RtspClient {
                         // 开始流传输
                         mParameters.session.start();
                         mAsyHandler.post(mConnectionMonitor);
-                        // TODO 发送连接恢复消息
-//                        postMessage(MESSAGE_CONNECTION_RECOVERED);
+                        // 发送连接恢复消息
+                        postMessage(MESSAGE_CONNECTION_RECOVERED);
                     } catch (Exception e) {
                         abord();
                     }
                 } catch (IOException e) {
+                    // 1s后进行重连
                     mAsyHandler.postDelayed(mRetryConnection, 1000);
                 }
             }
@@ -292,5 +367,51 @@ public class RtspClient {
      */
     public interface Callback {
         public void onRtspUpdate(int message, Exception exception);
+    }
+
+
+    static class Response {
+
+        // Parses method & uri
+        public static final Pattern regexStatus = Pattern.compile("RTSP/\\d.\\d (\\d+) (\\w+)",Pattern.CASE_INSENSITIVE);
+        // Parses a request header
+        public static final Pattern rexegHeader = Pattern.compile("(\\S+):(.+)",Pattern.CASE_INSENSITIVE);
+        // Parses a WWW-Authenticate header
+        public static final Pattern rexegAuthenticate = Pattern.compile("realm=\"(.+)\",\\s+nonce=\"(\\w+)\"",Pattern.CASE_INSENSITIVE);
+        // Parses a Session header
+        public static final Pattern rexegSession = Pattern.compile("(\\d+)",Pattern.CASE_INSENSITIVE);
+        // Parses a Transport header
+        public static final Pattern rexegTransport = Pattern.compile("client_port=(\\d+)-(\\d+).+server_port=(\\d+)-(\\d+)",Pattern.CASE_INSENSITIVE);
+
+
+        public int status;
+        public HashMap<String,String> headers = new HashMap<String,String>();
+
+        /** 解析Rtsp服务器返回的请求 */
+        public static Response parseResponse(BufferedReader input) throws IOException, IllegalStateException, SocketException {
+            Response response = new Response();
+            String line;
+            Matcher matcher;
+            // Parsing request method & uri
+            if ((line = input.readLine())==null) throw new SocketException("Connection lost");
+            matcher = regexStatus.matcher(line);
+            matcher.find();
+            response.status = Integer.parseInt(matcher.group(1));
+
+            // 解析消息头
+            while ( (line = input.readLine()) != null) {
+                //Log.e(TAG,"l: "+line.length()+"c: "+line);
+                if (line.length()>3) {
+                    matcher = rexegHeader.matcher(line);
+                    matcher.find();
+                    response.headers.put(matcher.group(1).toLowerCase(Locale.US),matcher.group(2));
+                } else {
+                    break;
+                }
+            }
+            if (line==null) throw new SocketException("Connection lost");
+            L.d("Response from server: "+response.status);
+            return response;
+        }
     }
 }

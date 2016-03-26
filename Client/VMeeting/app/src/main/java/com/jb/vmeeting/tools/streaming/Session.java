@@ -24,9 +24,9 @@ public class Session {
     private AudioStream mAudioStream = null;
     private VideoStream mVideoStream = null;
 
-    private String mOrigin;
-    private String mDestination;
-    private long mTimestamp;
+    private String mOrigin;      // 本机地址
+    private String mDestination; // 目标地址
+    private long mTimestamp;     // NTP 时间戳
 
     private SessionCallBack mCallback;
     private Handler mMainHandler; // 用于发布到UI线程
@@ -113,6 +113,14 @@ public class Session {
         return mDestination;
     }
 
+    public Stream getTrack(int id) {
+        if (id == 0) {
+            return mAudioStream;
+        } else {
+            return mVideoStream;
+        }
+    }
+
     public AudioStream getAudioTrack() {
         return mAudioStream;
     }
@@ -147,7 +155,7 @@ public class Session {
      */
     public void setPreviewOrientation(int orientation) {
         if (mVideoStream != null) {
-//            mVideoStream.setPreviewOrientation(orientation);
+            mVideoStream.setPreviewOrientation(orientation);
         }
     }
 
