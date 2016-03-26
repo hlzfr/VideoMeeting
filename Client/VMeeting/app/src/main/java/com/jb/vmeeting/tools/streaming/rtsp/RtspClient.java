@@ -51,7 +51,7 @@ public class RtspClient {
     private int mCSeq = 0; // 标识事务先后顺序
 
     private Handler mMainHandler;
-    private Handler mAsyHandler;
+    private Handler mAsyncHandler;
     private Callback mCallback;
 
     private Parameters mTmpParameters; // 做为参数的中间存储用,防止对Parameters的修改影响到正在进行的传输
@@ -75,7 +75,7 @@ public class RtspClient {
         new HandlerThread("com.jb.streaming.RtspClient"){
             @Override
             protected void onLooperPrepared() {
-                mAsyHandler = new Handler();
+                mAsyncHandler = new Handler();
                 signal.release();
             }
         }.start();
@@ -105,7 +105,7 @@ public class RtspClient {
     public void startStream() {
         if (mTmpParameters.host == null) throw new IllegalStateException("setServerAddress(String,int) has not been called !");
         if (mTmpParameters.session == null) throw new IllegalStateException("setSession() has not been called !");
-        mAsyHandler.post(new Runnable() {
+        mAsyncHandler.post(new Runnable() {
             @Override
             public void run() {
                 if (mState != STATE_STOPPED) return;
@@ -140,7 +140,7 @@ public class RtspClient {
                     // 开始传输流
                     mParameters.session.syncStart();
                     mState = STATE_STARTED;
-                    mAsyHandler.post(mConnectionMonitor);
+                    mAsyncHandler.post(mConnectionMonitor);
                 } catch (Exception e) {
                     abord();
                 }
@@ -151,17 +151,24 @@ public class RtspClient {
 
     /**
      * 停止流传输并中断连接
+     * 运行在异步线程
      */
     public void stopStream() {
-        if (mParameters != null && mParameters.session != null) {
-            // 停止流传输
-            mParameters.session.stop();
-        }
-        if (mState != STATE_STOPPED) {
-            mState = STATE_STOPPING;
-            // 中断连接
-            abord();
-        }
+        mAsyncHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // FIXME 好像执行不到 run 这里面
+                if (mParameters != null && mParameters.session != null) {
+                    // 停止流传输
+                    mParameters.session.stop();
+                }
+                if (mState != STATE_STOPPED) {
+                    mState = STATE_STOPPING;
+                    // 中断连接
+                    abord();
+                }
+            }
+        });
     }
 
     private void tryConnection() throws IOException {
@@ -267,8 +274,8 @@ public class RtspClient {
         try {
             mSocket.close();
         } catch (Exception ignore) {}
-        mAsyHandler.removeCallbacks(mConnectionMonitor);
-        mAsyHandler.removeCallbacks(mRetryConnection);
+        mAsyncHandler.removeCallbacks(mConnectionMonitor);
+        mAsyncHandler.removeCallbacks(mRetryConnection);
         mState = STATE_STOPPED;
     }
 
@@ -279,7 +286,7 @@ public class RtspClient {
                 try {
                     // 用option命令轮询rtsp服务器
                     sendRequestOption();
-                    mAsyHandler.postDelayed(mConnectionMonitor, 6000);
+                    mAsyncHandler.postDelayed(mConnectionMonitor, 6000);
                 } catch (IOException e) {
                     // OPTION 请求失败
                     // 发送连接丢失消息
@@ -287,7 +294,7 @@ public class RtspClient {
                     L.e("Connection lost with the server...");
                     // 停止流传输
                     mParameters.session.stop();
-                    mAsyHandler.post(mRetryConnection);
+                    mAsyncHandler.post(mRetryConnection);
                 }
             }
         }
@@ -303,7 +310,7 @@ public class RtspClient {
                     try {
                         // 开始流传输
                         mParameters.session.start();
-                        mAsyHandler.post(mConnectionMonitor);
+                        mAsyncHandler.post(mConnectionMonitor);
                         // 发送连接恢复消息
                         postMessage(MESSAGE_CONNECTION_RECOVERED);
                     } catch (Exception e) {
@@ -311,7 +318,7 @@ public class RtspClient {
                     }
                 } catch (IOException e) {
                     // 1s后进行重连
-                    mAsyHandler.postDelayed(mRetryConnection, 1000);
+                    mAsyncHandler.postDelayed(mRetryConnection, 1000);
                 }
             }
         }
@@ -343,12 +350,12 @@ public class RtspClient {
      * 该客户端的参数
      */
     private class Parameters {
-        public String host; // 域名(或IP地址)
+        public String host; // 服务端域名(或IP地址)
 //        public String username;
 //        public String password;
         public String path; // 房间名
         public Session session;
-        public int port; // 端口
+        public int port; // 服务端监听端口
 
         public Parameters clone() {
             Parameters params = new Parameters();
@@ -362,13 +369,12 @@ public class RtspClient {
         }
     }
 
-    /**
-     * rtsp连接服务端的结果回调
-     */
     public interface Callback {
+        /**
+         * rtsp连接服务端的结果回调
+         */
         public void onRtspUpdate(int message, Exception exception);
     }
-
 
     static class Response {
 

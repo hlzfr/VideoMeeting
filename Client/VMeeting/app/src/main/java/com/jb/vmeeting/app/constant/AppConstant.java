@@ -7,4 +7,8 @@ package com.jb.vmeeting.app.constant;
 public class AppConstant {
     public static final boolean DEBUG = true;
     public static final boolean LOG_OPEN = DEBUG;
+
+    public static final String STREAM_SERVER_HOST = "192.168.1.105";
+    public static final int STREAM_SERVER_PORT = 554;
+
 }

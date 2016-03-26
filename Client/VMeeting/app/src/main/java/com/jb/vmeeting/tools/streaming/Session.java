@@ -10,6 +10,7 @@ import com.jb.vmeeting.tools.streaming.audio.AudioStream;
 import com.jb.vmeeting.tools.streaming.video.VideoStream;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -21,12 +22,16 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Session {
 
+    public final static int STREAM_VIDEO = 0x01;
+    public final static int STREAM_AUDIO = 0x00;
+
     private AudioStream mAudioStream = null;
     private VideoStream mVideoStream = null;
 
-    private String mOrigin;      // 本机地址
-    private String mDestination; // 目标地址
-    private long mTimestamp;     // NTP 时间戳
+    private String mOrigin;       // 本机地址
+    private String mDestination;  // 目标地址
+    private long mTimestamp;      // NTP 时间戳
+    private int mTimeToLive = 64; // IP协议中的数据包生存时间
 
     private SessionCallBack mCallback;
     private Handler mMainHandler; // 用于发布到UI线程
@@ -58,7 +63,7 @@ public class Session {
     }
 
     /**
-     * 使用{@link SessionBuilder}来设置本机地址
+     * 设置本机地址
      * @param origin
      */
     public void setOrigin(String origin) {
@@ -66,7 +71,15 @@ public class Session {
     }
 
     /**
-     * 使用{@link SessionBuilder}来设置目标地址
+     * 设置ip协议中数据包生存时间
+     * @param ttl
+     */
+    public void setTimeToLive(int ttl) {
+        mTimeToLive = ttl;
+    }
+
+    /**
+     * 设置目标地址
      * @param destination
      */
     public void setDestination(String destination) {
@@ -91,13 +104,18 @@ public class Session {
         mVideoStream = track;
     }
 
+    /**
+     * 使用{@link SessionBuilder}来设置
+     */
     void removeAudioTrack() {
         if (mAudioStream != null) {
             mAudioStream.stop();
             mAudioStream = null;
         }
     }
-
+    /**
+     * 使用{@link SessionBuilder}来设置
+     */
     void removeVideoTrack() {
         if (mVideoStream != null) {
             mVideoStream.stopPreview();
@@ -131,6 +149,13 @@ public class Session {
 
     public void setCallback(SessionCallBack callback) {
         mCallback = callback;
+    }
+
+    public boolean isStreaming() {
+        if ( (mAudioStream!=null && mAudioStream.isStreaming()) || (mVideoStream!=null && mVideoStream.isStreaming()) )
+            return true;
+        else
+            return false;
     }
 
     /**
@@ -169,22 +194,28 @@ public class Session {
             public void run() {
                 try {
                     syncConfigure();
-                } catch (Exception e) {};
+                } catch (Exception ignore) {};
             }
         });
     }
 
     public void syncConfigure() throws RuntimeException, IOException {
-
         for (int id=0;id<2;id++) {
             Stream stream = id==0 ? mAudioStream : mVideoStream;
             if (stream!=null && !stream.isStreaming()) {
-                // 配置音视频流
-                stream.configure();
-                // TODO 若配置失败，发送失败消息
+                try {
+                    // 配置音视频流
+                    stream.configure();
+                } catch (Exception e) {
+                    // TODO define error code
+                    // 发送失败消息
+                    postError(-1 , id, e);
+                    throw e;
+                }
             }
         }
-        //TODO 发送session配置成功消息
+        // 发送session配置成功消息
+        postSessionConfigured();
     }
 
 
@@ -231,23 +262,64 @@ public class Session {
             public void run() {
                 try {
                     syncStart();
-                } catch (Exception e) {}
+                } catch (Exception ignore) {
+                }
             }
         });
     }
 
-    public void syncStart(){
+    public void syncStart() throws IOException, RuntimeException{
         syncStart(1);
-        syncStart(0);
-        //TODO 若syncStart(0)开始失败，开启失败的处理 syncStop(1)
+        try {
+            syncStart(0);
+        } catch (Exception e) {
+            // 开始失败，停止已经开始的流传输
+            syncStop(1);
+        }
     }
 
     /**
      * 同步线程开始流传输
      * @param id 流id，0代表音频，1代表视频
      */
-    public void syncStart(int id) {
-        // TODO 同步开始流的传输
+    public void syncStart(int id) throws IOException, RuntimeException {
+        Stream stream = id==0 ? mAudioStream : mVideoStream;
+        if (stream != null && !stream.isStreaming()) {
+            try {
+                InetAddress destination = InetAddress.getByName(mDestination);
+                stream.setTimeToLive(mTimeToLive);
+                stream.setDestinationAddress(destination);
+                stream.start();
+                if (getTrack(1 - id) == null || getTrack(1 - id).isStreaming()) {
+                    // 若另一种流为空，说明该session只有一种流
+                    // 由于上面本次的流已经执行了start，所有的流(只有本次)都正在传输，可以发送流传输消息
+
+                    // 若另一种流正在传输，
+                    // 由于上面本次的流已经执行了start，所有的流(两种)都正在传输，可以发送流传输消息
+
+                    // 若另一种流不为空且没有正在传输流，说明还有一种流还没开始传输，不发送流传输消息
+                    // 发送流开始传输的消息
+                    postSessionStarted();
+                }
+
+                if (getTrack(1 - id) == null || !getTrack(1 - id).isStreaming()) {
+                    // 若另一种流为空，说明该session只有一种流
+                    // 说明本次是首次syncStart的，开启定时更新消息
+
+                    // 若另一种流没在传输
+                    // 说明本次是首次syncStart，开启定时更新消息
+
+                    // 若另一种流不为空且正在传输流，说明另一种流syncStart过，不用再开启定时更新消息
+
+                    // TODO 开始定时发送bit更新消息
+//                    sHandler.post(mUpdateBitrate);
+                }
+            } catch (Exception e) {
+                // TODO define error code
+                postError(-1, id, e);
+                throw e;
+            }
+        }
     }
 
     /**
@@ -274,8 +346,7 @@ public class Session {
     public void syncStop() {
         syncStop(0);
         syncStop(1);
-        // TODO 发送session停止消息
-//        postSessionStopped();
+        postSessionStopped();
     }
 
     public void startPreview() {
@@ -283,9 +354,73 @@ public class Session {
             @Override
             public void run() {
                 if (mVideoStream != null) {
-                    //TODO 配置mVideoStream并开始预览
-                    //TODO 发送开始预览消息
-                    //TODO 若开启预览失败发送预览失败消息
+                    try {
+                        // 配置并开始预览
+                        mVideoStream.configure();
+                        mVideoStream.startPreview();
+                        // 发送开始预览消息
+                        postPreviewStarted();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        // 发送预览失败消息
+                        // TODO define error code
+                        postError(-1, STREAM_VIDEO, e);
+                    }
+                }
+            }
+        });
+    }
+
+    private void postError(final int reason, final int streamType,final Exception e) {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mCallback != null) {
+                    mCallback.onSessionError(reason, streamType, e);
+                }
+            }
+        });
+    }
+
+    private void postSessionStarted() {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mCallback != null) {
+                    mCallback.onSessionStarted();
+                }
+            }
+        });
+    }
+
+    private void postSessionConfigured() {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mCallback != null) {
+                    mCallback.onSessionConfigured();
+                }
+            }
+        });
+    }
+
+    private void postPreviewStarted() {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mCallback != null) {
+                    mCallback.onPreviewStarted();
+                }
+            }
+        });
+    }
+
+    private void postSessionStopped() {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mCallback != null) {
+                    mCallback.onSessionStopped();
                 }
             }
         });
@@ -301,6 +436,24 @@ public class Session {
             }
         });
     }
+
+    public void release() {
+        removeAudioTrack();
+        removeVideoTrack();
+        sHandler.getLooper().quit();
+    }
+
+    private Runnable mUpdateBitrate = new Runnable() {
+        @Override
+        public void run() {
+            if (isStreaming()) {
+//                postBitRate(getBitrate());
+                sHandler.postDelayed(mUpdateBitrate, 500);
+            } else {
+//                postBitRate(0);
+            }
+        }
+    };
 
     public interface SessionCallBack {
         public void onBitrareUpdate(long bitrate);
