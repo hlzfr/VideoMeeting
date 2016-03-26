@@ -11,6 +11,8 @@ public class AccountSession {
 
     private User mCurrentUser;
 
+    private AccountSession() {}
+
     public static AccountSession getAccountSession() {
         return SingletonHolder.session;
     }

@@ -31,7 +31,7 @@ public class AccountManager {
         return SingleHolder.sAccountManager;
     }
 
-    public AccountManager() {
+    private AccountManager() {
         mAccountService = RetrofitHelper.createService(AccountService.class);
     }
 
@@ -53,7 +53,7 @@ public class AccountManager {
                 if (user != null) {
                     AccountSession.getAccountSession().setCurrentUser(user);
                     // post login success event
-                    EventBus.getDefault().post(new LoginEvent(true, "login success", user));
+                    EventBus.getDefault().post(new LoginEvent(true, "login success", AccountSession.getAccountSession().getCurrentUser()));
                 } else {
                     EventBus.getDefault().post(new LoginEvent(false, "empty user", null));
                 }
