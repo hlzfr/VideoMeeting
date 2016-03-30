@@ -90,13 +90,13 @@ public class SessionBuilder {
             video.setPreviewOrientation(mOrientation);
             video.setCamera(mCameraId);
             // TODO if set destination port necessary ?
-//            video.setDestinationPorts(5006);
+            video.setDestinationPorts(5006);
         }
 
         if (session.getAudioTrack() != null) {
             AudioStream audio = session.getAudioTrack();
             // TODO if set destination port necessary ?
-//            audio.setDestinationPorts(5004);
+            audio.setDestinationPorts(5004);
         }
 
         return session;

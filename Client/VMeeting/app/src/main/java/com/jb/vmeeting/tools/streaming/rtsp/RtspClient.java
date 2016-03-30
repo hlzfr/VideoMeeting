@@ -154,10 +154,10 @@ public class RtspClient {
      * 运行在异步线程
      */
     public void stopStream() {
-        mAsyncHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // FIXME 好像执行不到 run 这里面
+//        mAsyncHandler.post(new Runnable() {
+//            @Override
+                // can't achieve here? 好像执行不到 run 这里面
+//            public void run() {
                 if (mParameters != null && mParameters.session != null) {
                     // 停止流传输
                     mParameters.session.stop();
@@ -167,8 +167,8 @@ public class RtspClient {
                     // 中断连接
                     abord();
                 }
-            }
-        });
+//            }
+//        });
     }
 
     private void tryConnection() throws IOException {

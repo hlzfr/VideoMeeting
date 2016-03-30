@@ -311,7 +311,7 @@ public class Session {
 
                     // 若另一种流不为空且正在传输流，说明另一种流syncStart过，不用再开启定时更新消息
 
-                    // TODO 开始定时发送bit更新消息
+                    // TODO post update bit message. 开始定时发送bit更新消息
 //                    sHandler.post(mUpdateBitrate);
                 }
             } catch (Exception e) {

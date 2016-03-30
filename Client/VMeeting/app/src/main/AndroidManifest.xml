@@ -13,6 +13,11 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- 音视频权限 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
     <!-- 休眠唤醒 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -40,8 +45,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity android:name=".page.activity.SignUpActivity"
-            android:label="@string/title_login"
+            android:label="@string/title_sign_up"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity android:name=".page.activity.VideoChatActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

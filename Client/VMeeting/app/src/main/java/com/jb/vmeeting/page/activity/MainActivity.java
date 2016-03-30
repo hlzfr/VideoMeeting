@@ -28,6 +28,10 @@ public class MainActivity extends BaseActivity {
         PageNavigator.getInstance().toLoginActivity(this);
     }
 
+    public void toVideoChatActivity(View view) {
+        PageNavigator.getInstance().toChatActivity(this);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

@@ -13,4 +13,7 @@
     <!-- text on view -->
     <string name="text_login">登录</string>
     <string name="text_sign_up">注册</string>
+    <string name="text_video_chat">视频聊天</string>
+    <string name="title_video_chat">视频聊天</string>
+    <string name="text_start">开始</string>
 </resources>

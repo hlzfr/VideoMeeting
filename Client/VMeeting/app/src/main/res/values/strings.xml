@@ -8,10 +8,13 @@
     <!--activity title name-->
     <string name="title_login">Login</string>
     <string name="title_sign_up">Sign Up</string>
+    <string name="title_video_chat">Chat</string>
 
 
     <!-- text on view -->
     <string name="text_login">Login</string>
     <string name="text_sign_up">Sign Up</string>
+    <string name="text_video_chat">Video Chat</string>
+    <string name="text_start">Start</string>
 
 </resources>

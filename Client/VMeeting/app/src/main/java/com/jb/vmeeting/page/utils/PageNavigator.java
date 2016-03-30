@@ -9,6 +9,7 @@ import com.jb.vmeeting.app.constant.IntentConstant;
 import com.jb.vmeeting.page.activity.LoginActivity;
 import com.jb.vmeeting.page.activity.MainActivity;
 import com.jb.vmeeting.page.activity.SignUpActivity;
+import com.jb.vmeeting.page.activity.VideoChatActivity;
 
 /**
  * 页面跳转导航
@@ -30,6 +31,10 @@ public class PageNavigator {
 
     public void toSignUpActivity(@NonNull Context ctx) {
         toActivity(ctx, SignUpActivity.class);
+    }
+
+    public void toChatActivity(@NonNull Context ctx) {
+        toActivity(ctx, VideoChatActivity.class);
     }
 
     private void toActivity(@NonNull Context ctx, @NonNull Class clazz) {
