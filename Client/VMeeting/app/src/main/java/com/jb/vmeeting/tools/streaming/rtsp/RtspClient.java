@@ -3,6 +3,7 @@ package com.jb.vmeeting.tools.streaming.rtsp;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.tools.streaming.Session;
@@ -154,10 +155,10 @@ public class RtspClient {
      * 运行在异步线程
      */
     public void stopStream() {
-//        mAsyncHandler.post(new Runnable() {
-//            @Override
-                // can't achieve here? 好像执行不到 run 这里面
-//            public void run() {
+        mAsyncHandler.post(new Runnable() {
+            @Override
+            //FIXME can't achieve here? 好像执行不到 run 这里面
+            public void run() {
                 if (mParameters != null && mParameters.session != null) {
                     // 停止流传输
                     mParameters.session.stop();
@@ -167,8 +168,8 @@ public class RtspClient {
                     // 中断连接
                     abord();
                 }
-//            }
-//        });
+            }
+        });
     }
 
     private void tryConnection() throws IOException {
@@ -183,7 +184,7 @@ public class RtspClient {
 
     private void sendRequestAnnounce() throws IOException, IllegalStateException, SocketException{
         String body = mParameters.session.getSessionDescription();
-        String request = "ANNOUNCE rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
+        String request = "ANNOUNCE rtsp://" + mParameters.host + ":" + mParameters.port + mParameters.path + " RTSP/1.0\r\n" +
                 "CSeq: " + (++mCSeq) + "\r\n" +
                 "Content-Length: " + body.length() + "\r\n" +
                 "Content-Type: application/sdp \r\n\r\n" +
@@ -210,10 +211,17 @@ public class RtspClient {
         for (int i=0;i<2;i++) {
             Stream stream = mParameters.session.getTrack(i);
             if (stream != null) {
-                String request = "SETUP rtsp://" + mParameters.host + ":" + mParameters.port + mParameters.path + "/trackID=" + i + " RTSP/1.0\r\n" +
+                boolean addSession = false;
+                if (!TextUtils.isEmpty(mSessionID)) {
+                    addSession = true;
+                }
+                // TODO interleaved始终是0-1？mode始终是record？
+                String request = "SETUP rtsp://" + mParameters.host + ":" + mParameters.port + mParameters.path + "/trackID=" + (i) + " RTSP/1.0\r\n" +
                         "CSeq: " + (++mCSeq) + "\r\n" +
-                        "User-Agent: Android\r\n"+
-                        "Transport: RTP/AVP/TCP;unicast;mode=record;interleaved=" + (i) + "-" + (i + 1) + "\r\n\r\n";
+                        "User-Agent: Android\r\n" +
+                        "Transport: RTP/AVP/TCP;unicast;mode=record;interleaved=0-1\r\n" +
+                        (addSession ? "Session: " + mSessionID + "\r\n" : "") +
+                        "\r\n";
 
                 L.i(request.substring(0, request.indexOf("\r\n")));
 
@@ -246,7 +254,7 @@ public class RtspClient {
         String request = "OPTIONS rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
                 "CSeq: " + (++mCSeq) + "\r\n" +
                 "Content-Length: 0\r\n" +
-                "Session: " + mSessionID + "\r\n";
+                "Session: " + mSessionID + "\r\n\r\n";
         L.i(request.substring(0, request.indexOf("\r\n")));
         mOutputStream.write(request.getBytes("UTF-8"));
         Response.parseResponse(mBufferedReader);
@@ -255,10 +263,11 @@ public class RtspClient {
     private void sendRequestTeardown() throws IOException {
         String request = "TEARDOWN rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
                 "CSeq: " + (++mCSeq) + "\r\n" +
-                "Content-Length: 0\r\n" +
-                "Session: " + mSessionID + "\r\n";
+                "User-Agent: Android\r\n" +
+                "Session: " + mSessionID + "\r\n\r\n";
         L.i(request.substring(0, request.indexOf("\r\n")));
         mOutputStream.write(request.getBytes("UTF-8"));
+        Response.parseResponse(mBufferedReader);
     }
     public boolean isStreaming() {
         return mState==STATE_STARTED|mState==STATE_STARTING;
@@ -270,7 +279,9 @@ public class RtspClient {
     private void abord() {
         try {
             sendRequestTeardown();
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+            L.e(ignore);
+        }
         try {
             mSocket.close();
         } catch (Exception ignore) {}
@@ -399,7 +410,9 @@ public class RtspClient {
             String line;
             Matcher matcher;
             // Parsing request method & uri
-            if ((line = input.readLine())==null) throw new SocketException("Connection lost");
+            if ((line = input.readLine())==null) {
+                throw new SocketException("Connection lost");
+            }
             matcher = regexStatus.matcher(line);
             matcher.find();
             response.status = Integer.parseInt(matcher.group(1));

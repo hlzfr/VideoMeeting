@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * 全局log开关
  * 自动设置TAG为当前类名
@@ -41,6 +44,14 @@ public final class L {
         Log.w(getTag(null), formatMessage(message, args));
     }
 
+    public static void e(Exception e) {
+        if(!LOG_OPEN) return ;
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stack = sw.toString();
+        Log.e(getTag(null), stack);
+    }
     public static void e(String message, Object... args) {
         if(!LOG_OPEN) return ;
         Log.e(getTag(null), formatMessage(message, args));
@@ -131,7 +142,7 @@ public final class L {
         String className = stackTrace.getClassName();
         String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
         String tag = TextUtils.isEmpty(customTag) ? TAG_HEAD + "/" + simpleClassName : TAG_HEAD + "/" + customTag;
-        String position = " [("+simpleClassName+".java:"+stackTrace.getLineNumber()+")#"+stackTrace.getMethodName() +"]";
+        String position = " [("+simpleClassName.split("\\$")[0]+".java:"+stackTrace.getLineNumber()+")#"+stackTrace.getMethodName() +"]";
         return tag + position;
     }
 }

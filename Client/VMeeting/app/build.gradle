@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.jb.vmeeting"
-        minSdkVersion 11
+        minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -26,7 +26,6 @@ dependencies {
     //    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
     //    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     compile files('libs/universal-image-loader-1.9.5.jar')
-    compile files('libs/retrofit-2.0.0.jar')
     compile files('libs/converter-gson-2.0.0-beta4.jar')
     compile files('libs/retrofit-2.0.0-beta4.jar')
     compile files('libs/gson-2.6.2.jar')
