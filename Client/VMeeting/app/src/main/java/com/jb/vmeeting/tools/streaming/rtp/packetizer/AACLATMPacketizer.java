@@ -15,8 +15,7 @@ import java.io.IOException;
  * Encapsulates AAC Access Units in RTP packets as specified in the RFC 3640.
  * This packetizer is used by the AACStream class in conjunction with the 
  * MediaCodec API introduced in Android 4.1 (API Level 16).
- * 打包并发送AAC编码后的数据
- *
+ * 打包并发送使用MediaCodec进行AAC编码后的数据
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class AACLATMPacketizer extends AbstractPacketizer implements Runnable {

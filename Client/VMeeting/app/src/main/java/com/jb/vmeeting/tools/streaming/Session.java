@@ -237,7 +237,7 @@ public class Session {
         sessionDescription.append("c=IN IP4 "+mDestination+"\r\n");
         // t=0 0 代表 session 是永久的 (不知道什么时候停止)
         sessionDescription.append("t=0 0\r\n");
-        sessionDescription.append("a=recvonly\r\n");
+//        sessionDescription.append("a=recvonly\r\n");
 
         if (mAudioStream != null) {
             sessionDescription.append(mAudioStream.getSessionDescription());

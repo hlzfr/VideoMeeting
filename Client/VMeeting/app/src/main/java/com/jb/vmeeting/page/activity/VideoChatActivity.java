@@ -2,6 +2,7 @@ package com.jb.vmeeting.page.activity;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 
@@ -58,5 +59,19 @@ public class VideoChatActivity extends BaseActivity implements IVideoChatView{
     @Override
     public void channelNameError(String message) {
         ToastUtil.toast("channelNameError " + message);
+    }
+
+    @Override
+    public SurfaceView getSurfaceView() {
+        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.sv_chat);
+        surfaceView.getHolder().setFixedSize(getResources().getDisplayMetrics().widthPixels,
+                getResources().getDisplayMetrics().heightPixels);
+        return surfaceView;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mVideoChatPresenter.destroy();
     }
 }

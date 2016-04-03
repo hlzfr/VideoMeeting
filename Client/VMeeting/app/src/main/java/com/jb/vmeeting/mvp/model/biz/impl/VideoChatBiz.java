@@ -1,11 +1,9 @@
 package com.jb.vmeeting.mvp.model.biz.impl;
 
-import com.jb.vmeeting.app.constant.AppConstant;
 import com.jb.vmeeting.mvp.model.biz.IVideoChatBiz;
 import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.tools.streaming.Session;
 import com.jb.vmeeting.tools.streaming.SessionBuilder;
-import com.jb.vmeeting.tools.streaming.audio.AACStream;
 import com.jb.vmeeting.tools.streaming.rtsp.RtspClient;
 
 /**
@@ -17,22 +15,16 @@ public class VideoChatBiz implements IVideoChatBiz{
     Session.SessionCallBack sessionCallBack;
     RtspClient.Callback clientCallback;
 
-    public VideoChatBiz(RtspClient.Callback clientCallback,Session.SessionCallBack sessionCallBack) {
+    public VideoChatBiz(RtspClient client, RtspClient.Callback clientCallback,Session.SessionCallBack sessionCallBack) {
         this.clientCallback = clientCallback;
         this.sessionCallBack = sessionCallBack;
-
-        initClient();
+        SessionBuilder.getInstance().setCallback(sessionCallBack);
+        setRtspClient(client);
+        rtspClient.setCallback(clientCallback);
     }
 
-    private void initClient() {
-        SessionBuilder.getInstance().setCallback(sessionCallBack);
-        SessionBuilder.getInstance().setAudioStream(new AACStream());
-        // TODO set video stream
-        Session session = SessionBuilder.getInstance().build();
-        rtspClient = new RtspClient();
-        rtspClient.setServerAddress(AppConstant.STREAM_SERVER_HOST, AppConstant.STREAM_SERVER_PORT);
-        rtspClient.setSession(session);
-        rtspClient.setCallback(clientCallback);
+    public void setRtspClient(RtspClient client) {
+        this.rtspClient = client;
     }
 
     @Override

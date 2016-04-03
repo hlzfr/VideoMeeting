@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.media.MediaCodec;
 import android.media.MediaCodec.BufferInfo;
 import android.media.MediaFormat;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
- * 将来自MediaCodec的InputStream进行rtp协议打包
+ * 将来自MediaCodec的ByteBuffer封装成InputStream提供给Packetizer进行rtp协议打包
  * 该类是非线程安全的
  */
 @SuppressLint("NewApi")
@@ -44,7 +45,7 @@ public class MediaCodecInputStream extends InputStream {
     }
 
 	@Override
-    public int read(byte[] buffer, int offset, int length) throws IOException {
+    public int read(@NonNull byte[] buffer, int offset, int length) throws IOException {
         int min = 0;
 
         try {
@@ -52,7 +53,7 @@ public class MediaCodecInputStream extends InputStream {
                 while (!Thread.interrupted() && !mClosed) {
                     mIndex = mMediaCodec.dequeueOutputBuffer(mBufferInfo, 500000);
 					if (mIndex>=0 ){
-						//Log.d(TAG,"Index: "+mIndex+" Time: "+mBufferInfo.presentationTimeUs+" size: "+mBufferInfo.size);
+//						Log.d(TAG,"Index: "+mIndex+" Time: "+mBufferInfo.presentationTimeUs+" size: "+mBufferInfo.size);
 						mBuffer = mBuffers[mIndex];
 						mBuffer.position(0);
 						break;

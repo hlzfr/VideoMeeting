@@ -157,7 +157,6 @@ public class RtspClient {
     public void stopStream() {
         mAsyncHandler.post(new Runnable() {
             @Override
-            //FIXME can't achieve here? 好像执行不到 run 这里面
             public void run() {
                 if (mParameters != null && mParameters.session != null) {
                     // 停止流传输

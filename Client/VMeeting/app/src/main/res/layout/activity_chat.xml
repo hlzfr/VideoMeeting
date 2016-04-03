@@ -4,10 +4,19 @@
     android:layout_height="match_parent">
     <include layout="@layout/toolbar" />
 
-    <Button
-        android:id="@+id/btn_chat_toggle"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="toggleChat"/>
+        android:layout_height="match_parent">
+
+        <SurfaceView
+            android:id="@+id/sv_chat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <Button
+            android:id="@+id/btn_chat_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="toggleChat"/>
+    </FrameLayout>
 
 </LinearLayout>
