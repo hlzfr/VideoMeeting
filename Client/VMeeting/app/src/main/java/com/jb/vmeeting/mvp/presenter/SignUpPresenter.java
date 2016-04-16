@@ -1,9 +1,8 @@
 package com.jb.vmeeting.mvp.presenter;
 
-import com.jb.vmeeting.mvp.model.biz.ISignUpBiz;
-import com.jb.vmeeting.mvp.model.biz.impl.SignUpBiz;
 import com.jb.vmeeting.mvp.model.eventbus.event.SignUpEvent;
 import com.jb.vmeeting.mvp.view.ISignUpView;
+import com.jb.vmeeting.tools.account.AccountManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -14,17 +13,15 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public class SignUpPresenter {
     ISignUpView signUpView;
-    ISignUpBiz signUpBiz;
 
     public SignUpPresenter(ISignUpView signUpView) {
         this.signUpView = signUpView;
-        this.signUpBiz = new SignUpBiz();
         EventBus.getDefault().register(this);
     }
 
     public void signUp() {
         signUpView.preSignUp();
-        signUpBiz.signUp(signUpView.getUsername(), signUpView.getPassword());
+        AccountManager.getInstance().signUp(signUpView.getUsername(), signUpView.getPassword());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

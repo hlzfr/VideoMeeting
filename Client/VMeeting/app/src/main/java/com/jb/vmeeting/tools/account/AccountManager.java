@@ -45,6 +45,12 @@ public class AccountManager {
         mAccountService.logout().enqueue(null);
     }
 
+    /**
+     * 发起登录行为
+     * 登录后会使用EventBus发送一个LoginEvent
+     * @param username
+     * @param password
+     */
     public void login(String username, String password) {
         mAccountService.login(username, password).enqueue(new Callback<User>() {
             @Override
@@ -66,6 +72,12 @@ public class AccountManager {
         });
     }
 
+    /**
+     * 发起一个注册行为
+     * 注册后会利用EventBus发起一个SignUpEvent
+     * @param username
+     * @param password
+     */
     public void signUp(String username, String password) {
         mAccountService.signUp(username, password).enqueue(new Callback<Void>() {
             @Override
@@ -100,6 +112,6 @@ public class AccountManager {
     }
 
     private static final class SingleHolder {
-        private static AccountManager sAccountManager = new AccountManager();
+        private static final AccountManager sAccountManager = new AccountManager();
     }
 }

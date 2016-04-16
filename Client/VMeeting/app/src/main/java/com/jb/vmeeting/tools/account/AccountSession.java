@@ -49,6 +49,6 @@ public class AccountSession {
     }
 
     private final static class SingletonHolder {
-        private static AccountSession session = new AccountSession();
+        private static final AccountSession session = new AccountSession();
     }
 }

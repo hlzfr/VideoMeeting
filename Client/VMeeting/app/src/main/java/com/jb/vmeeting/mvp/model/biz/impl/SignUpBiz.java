@@ -6,6 +6,7 @@ import com.jb.vmeeting.tools.account.AccountManager;
 /**
  * Created by Jianbin on 16/3/14.
  */
+@Deprecated
 public class SignUpBiz implements ISignUpBiz{
 
     @Override

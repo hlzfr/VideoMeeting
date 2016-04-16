@@ -9,6 +9,7 @@ import com.jb.vmeeting.tools.streaming.rtsp.RtspClient;
 /**
  * Created by Jianbin on 16/3/15.
  */
+@Deprecated
 public class VideoChatBiz implements IVideoChatBiz{
 
     RtspClient rtspClient;

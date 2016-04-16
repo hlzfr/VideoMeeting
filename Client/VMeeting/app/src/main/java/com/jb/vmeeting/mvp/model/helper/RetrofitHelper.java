@@ -1,5 +1,6 @@
 package com.jb.vmeeting.mvp.model.helper;
 
+import com.google.gson.GsonBuilder;
 import com.jb.vmeeting.app.constant.URLConstant;
 
 import retrofit2.Retrofit;
@@ -15,7 +16,10 @@ public class RetrofitHelper {
         public static final Retrofit INSTANCE = buildInstance();
         public static Retrofit buildInstance () {
             return  new Retrofit.Builder()
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(
+                            GsonConverterFactory.create(
+                            new GsonBuilder().excludeFieldsWithoutExposeAnnotation() // 没有@Expose注释的属性将不会被序列化
+                                    .create()))
                     .baseUrl(URLConstant.BASE_URL)
                     .client(OKHttpHelper.getInstance().getClient())
                     .build();
