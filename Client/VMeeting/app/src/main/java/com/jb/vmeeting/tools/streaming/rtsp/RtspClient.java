@@ -286,6 +286,7 @@ public class RtspClient {
         } catch (Exception ignore) {}
         mAsyncHandler.removeCallbacks(mConnectionMonitor);
         mAsyncHandler.removeCallbacks(mRetryConnection);
+        mSessionID = null;
         mState = STATE_STOPPED;
     }
 

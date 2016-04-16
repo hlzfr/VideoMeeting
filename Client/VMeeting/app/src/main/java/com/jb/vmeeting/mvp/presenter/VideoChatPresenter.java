@@ -16,8 +16,10 @@ import com.jb.vmeeting.tools.streaming.video.H264Stream;
 import com.jb.vmeeting.utils.SystemUtils;
 
 /**
+ * 弃用，考虑使用RoomChatPresenter通过WebRtc进行房间聊天
  * Created by Jianbin on 16/3/15.
  */
+@Deprecated
 public class VideoChatPresenter implements Session.SessionCallBack, RtspClient.Callback{
     IVideoChatBiz videoChatBiz;
     IVideoChatView videoChatView;
