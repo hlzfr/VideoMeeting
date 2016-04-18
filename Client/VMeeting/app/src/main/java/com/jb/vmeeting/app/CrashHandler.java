@@ -58,10 +58,11 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             // 上传到服务器
             uploadExceptionToServer();
         } catch (IOException e) {
-            e.printStackTrace();
+            L.e(e);
         }
 
         if (AppConstant.DEBUG) {
+            L.e(throwable);
             // 测试环境
             if (mDefaultCrashHandler != null) {
                 mDefaultCrashHandler.uncaughtException(thread, throwable);

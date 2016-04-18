@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcelable;
@@ -200,6 +201,12 @@ public final class ViewUtils {
 		DisplayMetrics dm = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		return new ScreenInfo(dm.widthPixels, dm.heightPixels);
+	}
+
+	public static Point getDisplaySize(Activity activity) {
+		Point displaySize = new Point();
+		activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+		return displaySize;
 	}
 
 	public static class ScreenInfo {

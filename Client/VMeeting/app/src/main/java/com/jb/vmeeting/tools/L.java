@@ -82,12 +82,20 @@ public final class L {
     }
     public static void w(Throwable e) {
         if(!LOG_OPEN) return ;
-        e.printStackTrace();
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stack = sw.toString();
+        Log.w(getTag(null), stack);
     }
 
     public static void e(Throwable e) {
         if(!LOG_OPEN) return ;
-        e.printStackTrace();
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stack = sw.toString();
+        Log.e(getTag(null), stack);
     }
 
     public static void json(String tag, String json) {

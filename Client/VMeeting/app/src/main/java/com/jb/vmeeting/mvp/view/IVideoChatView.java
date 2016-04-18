@@ -5,6 +5,7 @@ import android.view.SurfaceView;
 /**
  * Created by Jianbin on 16/3/15.
  */
+@Deprecated
 public interface IVideoChatView {
     String getChannelName();
     void onStartStream(); // 开始向服务端传输流

@@ -1,77 +1,59 @@
 package com.jb.vmeeting.page.activity;
 
+import android.graphics.Point;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.jb.vmeeting.R;
-import com.jb.vmeeting.mvp.presenter.VideoChatPresenter;
-import com.jb.vmeeting.mvp.view.IVideoChatView;
+import com.jb.vmeeting.mvp.presenter.RoomChatPresenter;
+import com.jb.vmeeting.mvp.view.IRoomChatView;
 import com.jb.vmeeting.page.base.BaseActivity;
-import com.jb.vmeeting.page.utils.ToastUtil;
+import com.jb.vmeeting.utils.ViewUtils;
 
 /**
  * Created by Jianbin on 16/3/15.
  */
-public class VideoChatActivity extends BaseActivity implements IVideoChatView{
+public class VideoChatActivity extends BaseActivity implements IRoomChatView{
 
-    VideoChatPresenter mVideoChatPresenter;
-
-    Button btnToggleChat;
+    RoomChatPresenter roomChatPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         super.onCreate(savedInstanceState);
+
+        roomChatPresenter = new RoomChatPresenter(this);
+        bindPresenterLifeTime(roomChatPresenter);
+    }
+
+    @Override
+    protected void initViews() {
         setContentView(R.layout.activity_chat);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        mVideoChatPresenter = new VideoChatPresenter(this);
-        btnToggleChat = (Button) findViewById(R.id.btn_chat_toggle);
-    }
-
-    public void toggleChat(View view) {
-        if (mVideoChatPresenter.isStreaming()) {
-            mVideoChatPresenter.stopStream();
-            btnToggleChat.setText("Start");
-        } else {
-            mVideoChatPresenter.startStream();
-            btnToggleChat.setText("Stop");
-        }
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
     }
 
     @Override
-    public String getChannelName() {
-        return "438";
+    public GLSurfaceView getSurfaceView() {
+        return (GLSurfaceView) findViewById(R.id.sv_chat);
     }
 
     @Override
-    public void onStartStream() {
-        ToastUtil.toast("onStartStream");
+    public Point getDisplaySize() {
+        return ViewUtils.getDisplaySize(this);
     }
 
     @Override
-    public void onStopStream() {
-        ToastUtil.toast("onStopStream");
-    }
-
-    @Override
-    public void channelNameError(String message) {
-        ToastUtil.toast("channelNameError " + message);
-    }
-
-    @Override
-    public SurfaceView getSurfaceView() {
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.sv_chat);
-        surfaceView.getHolder().setFixedSize(getResources().getDisplayMetrics().widthPixels,
-                getResources().getDisplayMetrics().heightPixels);
-        return surfaceView;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mVideoChatPresenter.destroy();
+    public String getRoomName() {
+        return "android_test";
     }
 }

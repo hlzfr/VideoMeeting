@@ -1,4 +1,7 @@
 <resources>
+    <string name="stream_host">192.168.1.103</string>
+    <string name="stream_port">3000</string>
+
     <string name="app_name">VMeeting</string>
     <string name="action_settings">Settings</string>
 

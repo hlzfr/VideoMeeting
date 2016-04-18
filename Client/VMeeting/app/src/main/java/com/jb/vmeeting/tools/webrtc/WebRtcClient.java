@@ -1,24 +1,25 @@
 package com.jb.vmeeting.tools.webrtc;
 
-import android.opengl.EGLContext;
-import android.util.Log;
-
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.webrtc.*;
-
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
+import com.github.nkzawa.emitter.Emitter;
+import com.jb.vmeeting.app.App;
+import com.jb.vmeeting.tools.L;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.opengl.EGLContext;
+import org.webrtc.*;
+
 public class WebRtcClient {
     private final static String TAG = WebRtcClient.class.getCanonicalName();
     private final static int MAX_PEER = 2;
-    private boolean[] endPoints = new boolean[MAX_PEER];
+    private boolean[] endPoints = new boolean[MAX_PEER]; // 用于统计当前连接的客户端数量
     private PeerConnectionFactory factory;
     private HashMap<String, Peer> peers = new HashMap<>();
     private LinkedList<PeerConnection.IceServer> iceServers = new LinkedList<>();
@@ -44,13 +45,16 @@ public class WebRtcClient {
         void onRemoveRemoteStream(int endPoint);
     }
 
+    /**
+     * 客户端收到消息后的处理命令
+     */
     private interface Command{
         void execute(String peerId, JSONObject payload) throws JSONException;
     }
 
     private class CreateOfferCommand implements Command{
         public void execute(String peerId, JSONObject payload) throws JSONException {
-            Log.d(TAG,"CreateOfferCommand");
+            L.d(TAG, "CreateOfferCommand");
             Peer peer = peers.get(peerId);
             peer.pc.createOffer(peer, pcConstraints);
         }
@@ -58,7 +62,7 @@ public class WebRtcClient {
 
     private class CreateAnswerCommand implements Command{
         public void execute(String peerId, JSONObject payload) throws JSONException {
-            Log.d(TAG,"CreateAnswerCommand");
+            L.d(TAG,"CreateAnswerCommand");
             Peer peer = peers.get(peerId);
             SessionDescription sdp = new SessionDescription(
                     SessionDescription.Type.fromCanonicalForm(payload.getString("type")),
@@ -71,7 +75,7 @@ public class WebRtcClient {
 
     private class SetRemoteSDPCommand implements Command{
         public void execute(String peerId, JSONObject payload) throws JSONException {
-            Log.d(TAG,"SetRemoteSDPCommand");
+            L.d(TAG, "SetRemoteSDPCommand");
             Peer peer = peers.get(peerId);
             SessionDescription sdp = new SessionDescription(
                     SessionDescription.Type.fromCanonicalForm(payload.getString("type")),
@@ -83,7 +87,7 @@ public class WebRtcClient {
 
     private class AddIceCandidateCommand implements Command{
         public void execute(String peerId, JSONObject payload) throws JSONException {
-            Log.d(TAG,"AddIceCandidateCommand");
+            L.d(TAG,"AddIceCandidateCommand");
             PeerConnection pc = peers.get(peerId).pc;
             if (pc.getRemoteDescription() != null) {
                 IceCandidate candidate = new IceCandidate(
@@ -97,7 +101,7 @@ public class WebRtcClient {
     }
 
     /**
-     * Send a message through the signaling server
+     * 发送消息给特定人员
      *
      * @param to id of recipient
      * @param type type of message
@@ -140,6 +144,7 @@ public class WebRtcClient {
                         int endPoint = findEndPoint();
                         if(endPoint != MAX_PEER) {
                             Peer peer = addPeer(from, endPoint);
+                            // 使对方接收本机音视频
                             peer.pc.addStream(localMS);
                             commandMap.get(type).execute(from, payload);
                         }
@@ -218,14 +223,14 @@ public class WebRtcClient {
 
         @Override
         public void onAddStream(MediaStream mediaStream) {
-            Log.d(TAG,"onAddStream "+mediaStream.label());
+            L.d(TAG,"onAddStream "+mediaStream.label());
             // remote streams are displayed from 1 to MAX_PEER (0 is localStream)
             mListener.onAddRemoteStream(mediaStream, endPoint+1);
         }
 
         @Override
         public void onRemoveStream(MediaStream mediaStream) {
-            Log.d(TAG,"onRemoveStream "+mediaStream.label());
+            L.d(TAG,"onRemoveStream "+mediaStream.label());
             removePeer(id);
         }
 
@@ -238,7 +243,7 @@ public class WebRtcClient {
         }
 
         public Peer(String id, int endPoint) {
-            Log.d(TAG,"new Peer: "+id + " " + endPoint);
+            L.d(TAG,"new Peer: "+id + " " + endPoint);
             this.pc = factory.createPeerConnection(iceServers, pcConstraints, this);
             this.id = id;
             this.endPoint = endPoint;
@@ -268,7 +273,8 @@ public class WebRtcClient {
     public WebRtcClient(RtcListener listener, String host, PeerConnectionParameters params, EGLContext mEGLcontext) {
         mListener = listener;
         pcParams = params;
-        PeerConnectionFactory.initializeAndroidGlobals(listener, true, true,
+        // initializeAndroidGlobals的第一个参数需要是activity或者application
+        PeerConnectionFactory.initializeAndroidGlobals(App.getInstance(), true, true,
                 params.videoCodecHwAcceleration, mEGLcontext);
         factory = new PeerConnectionFactory();
         MessageHandler messageHandler = new MessageHandler();
@@ -280,7 +286,7 @@ public class WebRtcClient {
         }
         client.on("id", messageHandler.onId);
         client.on("message", messageHandler.onMessage);
-        client.connect();
+        client.connect(); // connect后，服务端会emit一个id信息，返回该客户端的id
 
         iceServers.add(new PeerConnection.IceServer("stun:23.21.150.121"));
         iceServers.add(new PeerConnection.IceServer("stun:stun.l.google.com:19302"));
