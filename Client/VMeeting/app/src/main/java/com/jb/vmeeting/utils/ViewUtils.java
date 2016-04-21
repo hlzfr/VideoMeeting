@@ -9,6 +9,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcelable;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -16,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.ListView;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -208,6 +213,32 @@ public final class ViewUtils {
 		activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
 		return displaySize;
 	}
+
+	public static int getLastVisiblePosition(RecyclerView recyclerView) {
+		RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
+		int position;
+        if (manager instanceof GridLayoutManager) {
+            position = ((GridLayoutManager) manager).findLastVisibleItemPosition();
+        } else if (manager instanceof LinearLayoutManager) {
+            position = ((LinearLayoutManager) manager).findLastVisibleItemPosition();
+        } else if (manager instanceof StaggeredGridLayoutManager) {
+            StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) manager;
+            int[] lastPositions = layoutManager.findLastVisibleItemPositions(new int[layoutManager.getSpanCount()]);
+            position = getMaxPosition(lastPositions);
+        } else {
+            position = manager.getItemCount() - 1;
+        }
+        return position;
+	}
+
+	private static int getMaxPosition(int[] positions) {
+        int size = positions.length;
+        int maxPosition = Integer.MIN_VALUE;
+        for (int i = 0; i < size; i++) {
+            maxPosition = Math.max(maxPosition, positions[i]);
+        }
+        return maxPosition;
+    }
 
 	public static class ScreenInfo {
 		public int widthPixels;
