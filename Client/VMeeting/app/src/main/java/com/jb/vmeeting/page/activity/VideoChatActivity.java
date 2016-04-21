@@ -3,7 +3,6 @@ package com.jb.vmeeting.page.activity;
 import android.graphics.Point;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -19,6 +18,7 @@ import com.jb.vmeeting.utils.ViewUtils;
 public class VideoChatActivity extends BaseActivity implements IRoomChatView{
 
     RoomChatPresenter roomChatPresenter;
+    private GLSurfaceView mSurfaceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +31,7 @@ public class VideoChatActivity extends BaseActivity implements IRoomChatView{
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         super.onCreate(savedInstanceState);
 
+        mSurfaceView = (GLSurfaceView) findViewById(R.id.sv_chat);
         roomChatPresenter = new RoomChatPresenter(this);
         bindPresenterLifeTime(roomChatPresenter);
     }
@@ -44,7 +45,7 @@ public class VideoChatActivity extends BaseActivity implements IRoomChatView{
 
     @Override
     public GLSurfaceView getSurfaceView() {
-        return (GLSurfaceView) findViewById(R.id.sv_chat);
+        return mSurfaceView;
     }
 
     @Override
@@ -54,6 +55,7 @@ public class VideoChatActivity extends BaseActivity implements IRoomChatView{
 
     @Override
     public String getRoomName() {
+        // TODO get room name
         return "android_test";
     }
 }

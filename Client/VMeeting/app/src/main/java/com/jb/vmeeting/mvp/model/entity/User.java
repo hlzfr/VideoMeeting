@@ -1,6 +1,7 @@
 package com.jb.vmeeting.mvp.model.entity;
 
 import com.google.gson.annotations.Expose;
+import com.jb.vmeeting.tools.L;
 
 /**
  * Created by Jianbin on 2016/3/13.
@@ -34,7 +35,7 @@ public class User extends BaseEntity implements Cloneable{
         try {
             user = (User) super.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            L.e(e);
         }
         return user;
     }

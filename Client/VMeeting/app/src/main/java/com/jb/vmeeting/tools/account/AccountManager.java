@@ -84,7 +84,6 @@ public class AccountManager {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 //TODO check success or not
                 EventBus.getDefault().post(new SignUpEvent(true, "sign up success!"));
-
             }
 
             @Override

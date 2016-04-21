@@ -10,6 +10,10 @@ import com.jb.vmeeting.R;
 import com.jb.vmeeting.page.base.BaseActivity;
 import com.jb.vmeeting.page.utils.PageNavigator;
 
+/**
+ * 首页
+ * Created by Jianbin on 2016/3/13.
+ */
 public class MainActivity extends BaseActivity {
 
     @Override

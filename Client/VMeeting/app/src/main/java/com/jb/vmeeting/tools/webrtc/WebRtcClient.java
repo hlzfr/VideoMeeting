@@ -18,7 +18,7 @@ import org.webrtc.*;
 
 public class WebRtcClient {
     private final static String TAG = WebRtcClient.class.getCanonicalName();
-    private final static int MAX_PEER = 2;
+    private final static int MAX_PEER = 4;
     private boolean[] endPoints = new boolean[MAX_PEER]; // 用于统计当前连接的客户端数量
     private PeerConnectionFactory factory;
     private HashMap<String, Peer> peers = new HashMap<>();
@@ -200,8 +200,17 @@ public class WebRtcClient {
         @Override
         public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
             if(iceConnectionState == PeerConnection.IceConnectionState.DISCONNECTED) {
-                removePeer(id);
+//                removePeer(id);
                 mListener.onStatusChanged("DISCONNECTED");
+            } else if(iceConnectionState == PeerConnection.IceConnectionState.CHECKING) {
+                mListener.onStatusChanged("CHECKING");
+            } else if (iceConnectionState == PeerConnection.IceConnectionState.CLOSED) {
+                removePeer(id);
+                mListener.onStatusChanged("CLOSED");
+            } else if(iceConnectionState == PeerConnection.IceConnectionState.COMPLETED) {
+                mListener.onStatusChanged("COMPLETED");
+            } else if(iceConnectionState == PeerConnection.IceConnectionState.CONNECTED) {
+                mListener.onStatusChanged("CONNECTED");
             }
         }
 
