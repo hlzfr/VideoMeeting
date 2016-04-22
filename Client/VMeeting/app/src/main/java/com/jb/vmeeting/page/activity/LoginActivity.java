@@ -1,5 +1,6 @@
 package com.jb.vmeeting.page.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -30,7 +31,8 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         mLoginPresenter = new LoginPresenter(this);
     }
 
-    protected void initViews() {
+    @Override
+    protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_login);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -40,6 +42,11 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     @Override
     protected void setupListener() {
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent, Bundle bundle) {
+
     }
 
     // has been registered in xml layout

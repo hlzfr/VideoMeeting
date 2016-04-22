@@ -35,10 +35,8 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
     private boolean isRefreshing = false;
     private boolean isLoadMore = false;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
+    public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = createContentView(inflater, container, savedInstanceState);
         setRefreshPresenter(createPresenter(v));
         setSwipeRefreshLayout(createSwipeRefreshLayout(v));

@@ -1,5 +1,6 @@
 package com.jb.vmeeting.page.activity;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -30,6 +31,11 @@ public class VideoChatActivity extends BaseActivity implements IRoomChatView{
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void initViews(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_chat);
 
         mSurfaceView = (GLSurfaceView) findViewById(R.id.sv_chat);
         roomChatPresenter = new RoomChatPresenter(this);
@@ -37,10 +43,13 @@ public class VideoChatActivity extends BaseActivity implements IRoomChatView{
     }
 
     @Override
-    protected void initViews() {
-        setContentView(R.layout.activity_chat);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+    protected void setupListener() {
+
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent, Bundle bundle) {
+
     }
 
     @Override

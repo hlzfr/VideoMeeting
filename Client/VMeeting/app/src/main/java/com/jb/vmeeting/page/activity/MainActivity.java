@@ -1,5 +1,6 @@
 package com.jb.vmeeting.page.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -17,11 +18,20 @@ import com.jb.vmeeting.page.utils.PageNavigator;
 public class MainActivity extends BaseActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    protected void setupListener() {
+
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent, Bundle bundle) {
+
     }
 
     public void toSignUpActivity(View view) {

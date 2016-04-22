@@ -1,5 +1,6 @@
 package com.jb.vmeeting.page.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -29,14 +30,25 @@ public class SignUpActivity extends BaseActivity implements ISignUpView{
         mSignUpPresenter = new SignUpPresenter(this);
     }
 
+
     @Override
-    protected void initViews() {
+    protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_sign_up);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         edtUsername = findView(R.id.edt_signUp_username);
         edtPassword = findView(R.id.edt_signUp_password);
+    }
+
+    @Override
+    protected void setupListener() {
+
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent, Bundle bundle) {
+
     }
 
     public void onSignUpBtnClicked(View view) {
@@ -79,4 +91,5 @@ public class SignUpActivity extends BaseActivity implements ISignUpView{
         super.onDestroy();
         mSignUpPresenter.destroy();
     }
+
 }

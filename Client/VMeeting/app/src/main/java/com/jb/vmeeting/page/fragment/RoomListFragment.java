@@ -1,6 +1,9 @@
 package com.jb.vmeeting.page.fragment;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.jb.vmeeting.mvp.model.entity.Room;
 import com.jb.vmeeting.mvp.presenter.refreshlist.BaseRefreshablePresenter;
@@ -30,4 +33,5 @@ public class RoomListFragment extends SimpleListFragment<Room> {
     public boolean onItemLongClick(View view, int position) {
         return false;
     }
+
 }

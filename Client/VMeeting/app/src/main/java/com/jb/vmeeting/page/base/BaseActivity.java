@@ -3,6 +3,9 @@ package com.jb.vmeeting.page.base;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -14,7 +17,7 @@ import com.jb.vmeeting.mvp.presenter.PresenterLifeTime;
  * BaseActivity
  * Created by Jianbin on 2015/12/7.
  */
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     private Bundle mBundle;
     private PresenterLifeTime pLife;
@@ -24,10 +27,18 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        handleIntent(intent);
-        initViews();
+        mBundle = intent.getBundleExtra(IntentConstant.INTENT_EXTRA_BUNDLE);
+        initViews(savedInstanceState);
         setupListener();
+        // 对intent的处理可能涉及到视图,所以要在initViews之后调用
+        handleIntent(intent);
     }
+
+    protected abstract void initViews(Bundle savedInstanceState);
+
+    protected abstract void setupListener();
+
+    protected abstract void onHandleIntent(Intent intent, Bundle bundle);
 
     /**
      * should call in {@link #onCreate(Bundle)},
@@ -45,12 +56,13 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent);
+        mBundle = intent.getBundleExtra(IntentConstant.INTENT_EXTRA_BUNDLE);
         handleIntent(intent);
     }
 
     private void handleIntent(Intent intent) {
         if (null != intent) {
-            mBundle = intent.getBundleExtra(IntentConstant.INTENT_EXTRA_BUNDLE);
             onHandleIntent(intent, mBundle);
         }
     }
@@ -104,10 +116,6 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void onHandleIntent(Intent intent, Bundle bundle) {
-
-    }
-
     protected Bundle getBundle() {
         return mBundle;
     }
@@ -117,11 +125,29 @@ public class BaseActivity extends AppCompatActivity {
         return (T) super.findViewById(id);
     }
 
-    protected void initViews() {
+    Fragment mCurFragment;
 
+    public void switchFragment(@NonNull int fContentId, String tag, @NonNull CreateFragmentCallback callback) {
+        Fragment to = getSupportFragmentManager().findFragmentByTag(tag);
+        if (to == null) {
+            to = callback.onCreateFragment(tag);
+        }
+        if (mCurFragment != to) {
+            FragmentTransaction transaction = callback.onGetTransaction(this);
+            if (!to.isAdded()) {    // 先判断是否被add过
+                transaction.hide(mCurFragment).add(fContentId, to).commit(); // 隐藏当前的fragment，add下一个到Activity中
+            } else {
+                transaction.hide(mCurFragment).show(to).commit(); // 隐藏当前的fragment，显示下一个
+            }
+            mCurFragment = to;
+            transaction.commit();
+        }
     }
 
-    protected void setupListener() {
-
+    public static abstract class CreateFragmentCallback {
+        FragmentTransaction onGetTransaction(BaseActivity activity) {
+            return activity.getSupportFragmentManager().beginTransaction();
+        }
+        abstract BaseFragment onCreateFragment(String tag);
     }
 }
