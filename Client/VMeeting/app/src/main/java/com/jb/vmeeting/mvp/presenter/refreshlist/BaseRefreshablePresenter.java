@@ -14,10 +14,6 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
 
     boolean isLoading = false;
 
-    public BaseRefreshablePresenter() {
-
-    }
-
     public BaseRefreshablePresenter(IRefreshableListView<T> view) {
         setRefreshableView(view);
     }
@@ -40,7 +36,7 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
     }
 
     @Override
-    public void loadMore(int skip, int limit) {
+    public void loadMore(int page, int limit) {
         if (!canLoadMore()) {
             if (mView != null) {
                 mView.onLoadMoreFailed(SimpleCallback.ERR_LOCAL, "没有更多");
@@ -49,11 +45,11 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
             return;
         }
         isLoading = true;
-        loadMoreData(skip, limit);
+        loadMoreData(page, limit);
     }
 
     public abstract void refreshData();
-    public abstract void loadMoreData(int skip, int limit);
+    public abstract void loadMoreData(int page, int limit);
 
     public void refreshSuccess(Page<T> page) {
         isLoading = false;

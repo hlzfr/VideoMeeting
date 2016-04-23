@@ -1,8 +1,10 @@
 package com.jb.vmeeting.mvp.model.apiservice;
 
+import com.jb.vmeeting.mvp.model.entity.Result;
 import com.jb.vmeeting.mvp.model.entity.User;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -16,12 +18,12 @@ public interface AccountService {
 
     @FormUrlEncoded
     @POST("account/login")
-    Call<User> login(@Field("username") String username, @Field("password") String password);
+    Call<Result<User>> login(@Field("username") String username, @Field("password") String password);
 
     @FormUrlEncoded
     @POST("account/register")
-    Call<Void> signUp(@Field("username") String username, @Field("password") String password);
+    Call<Result<Void>> signUp(@Field("username") String username, @Field("password") String password);
 
     @GET("account/logout")
-    Call<Void> logout();
+    Call<Result<Void>> logout();
 }

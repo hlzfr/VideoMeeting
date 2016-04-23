@@ -1,7 +1,8 @@
 package com.jb.vmeeting.mvp.model.helper;
 
 import com.google.gson.GsonBuilder;
-import com.jb.vmeeting.app.constant.URLConstant;
+import com.jb.vmeeting.R;
+import com.jb.vmeeting.app.App;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -18,9 +19,9 @@ public class RetrofitHelper {
             return  new Retrofit.Builder()
                     .addConverterFactory(
                             GsonConverterFactory.create(
-                            new GsonBuilder().excludeFieldsWithoutExposeAnnotation() // 没有@Expose注释的属性将不会被序列化
-                                    .create()))
-                    .baseUrl(URLConstant.BASE_URL)
+                                    new GsonBuilder().excludeFieldsWithoutExposeAnnotation() // 没有@Expose注释的属性将不会被序列化
+                                            .create()))
+                    .baseUrl(App.getInstance().getString(R.string.common_base_url))
                     .client(OKHttpHelper.getInstance().getClient())
                     .build();
         }

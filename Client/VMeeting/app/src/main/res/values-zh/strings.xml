@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">视频会议</string>
+
+    <!-- toolbar option -->
     <string name="action_settings">设置</string>
+    <string name="action_create_room">创建房间</string>
 
     <!-- tip message -->
     <string name="no_access">未登录</string>

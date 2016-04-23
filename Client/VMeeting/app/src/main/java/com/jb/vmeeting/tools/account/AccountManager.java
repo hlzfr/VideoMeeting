@@ -1,15 +1,20 @@
 package com.jb.vmeeting.tools.account;
 
+import android.content.Context;
+
 import com.jb.vmeeting.R;
 import com.jb.vmeeting.app.App;
 import com.jb.vmeeting.mvp.model.apiservice.AccountService;
+import com.jb.vmeeting.mvp.model.entity.Result;
 import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.model.eventbus.event.LoginEvent;
 import com.jb.vmeeting.mvp.model.eventbus.event.SignUpEvent;
 import com.jb.vmeeting.mvp.model.helper.AuthCookie;
 import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
+import com.jb.vmeeting.mvp.model.helper.SimpleCallback;
 import com.jb.vmeeting.page.utils.PageNavigator;
 import com.jb.vmeeting.page.utils.ToastUtil;
+import com.jb.vmeeting.tools.L;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -52,22 +57,17 @@ public class AccountManager {
      * @param password
      */
     public void login(String username, String password) {
-        mAccountService.login(username, password).enqueue(new Callback<User>() {
+        mAccountService.login(username, password).enqueue(new SimpleCallback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                User user = response.body();
-                if (user != null) {
-                    AccountSession.getAccountSession().setCurrentUser(user);
-                    // post login success event
-                    EventBus.getDefault().post(new LoginEvent(true, "login success", AccountSession.getAccountSession().getCurrentUser()));
-                } else {
-                    EventBus.getDefault().post(new LoginEvent(false, "empty user", null));
-                }
+            public void onSuccess(int statusCode, Result<User> result) {
+                AccountSession.getAccountSession().setCurrentUser(result.body);
+                // post login success event
+                EventBus.getDefault().post(new LoginEvent(true, "login success", AccountSession.getAccountSession().getCurrentUser()));
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                EventBus.getDefault().post(new LoginEvent(false, t.getMessage(), null));
+            public void onFailed(int statusCode, Result<User> result) {
+                EventBus.getDefault().post(new LoginEvent(false, result.message, null));
             }
         });
     }
@@ -79,16 +79,15 @@ public class AccountManager {
      * @param password
      */
     public void signUp(String username, String password) {
-        mAccountService.signUp(username, password).enqueue(new Callback<Void>() {
+        mAccountService.signUp(username, password).enqueue(new SimpleCallback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                //TODO check success or not
-                EventBus.getDefault().post(new SignUpEvent(true, "sign up success!"));
+            public void onSuccess(int statusCode, Result<Void> result) {
+                EventBus.getDefault().post(new SignUpEvent(true, "sign up success! "));
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                EventBus.getDefault().post(new SignUpEvent(false, "sign up failed." + t.getMessage()));
+            public void onFailed(int statusCode, Result<Void> result) {
+                EventBus.getDefault().post(new SignUpEvent(false, "sign up failed." + result.message));
             }
         });
     }
@@ -97,14 +96,14 @@ public class AccountManager {
         return getAccountSession().hasLogin();
     }
 
-    public boolean checkLogin(boolean toLoginPageIfNotLogin, boolean toastMessageIfNotLogin) {
+    public boolean checkLogin(Context ctx, boolean toLoginPageIfNotLogin, boolean toastMessageIfNotLogin) {
         boolean hasLogin = checkLogin();
         if (!hasLogin) {
             if (toastMessageIfNotLogin) {
                 ToastUtil.toast(R.string.no_access);
             }
             if (toLoginPageIfNotLogin) {
-                PageNavigator.getInstance().toLoginActivity(App.getInstance());
+                PageNavigator.getInstance().toLoginActivity(ctx);
             }
         }
         return hasLogin;

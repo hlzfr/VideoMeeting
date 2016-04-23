@@ -1,10 +1,14 @@
 package com.jb.vmeeting.mvp.model.apiservice;
 
 import com.jb.vmeeting.mvp.model.entity.Page;
+import com.jb.vmeeting.mvp.model.entity.Result;
 import com.jb.vmeeting.mvp.model.entity.Room;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -17,11 +21,13 @@ public interface RoomService {
 
     /**
      *
-     * @param skip
+     * @param page
      * @param limit -1 means it's defined by servlet.
      * @return
      */
-    @GET("room/roomList")
-    Call<Page<Room>> getRoomList(@Query(value = "skip")int skip, @Query(value = "limit") int limit);
+    @GET("room/page/{page}/{limit}")
+    Call<Result<Page<Room>>> getRoomList(@Path("page")int page, @Path("limit") int limit);
 
+    @POST("room/create")
+    Call<Result<Room>> createRoom(@Body Room room);
 }

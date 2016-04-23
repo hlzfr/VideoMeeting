@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jb.vmeeting.R;
 import com.jb.vmeeting.page.base.BaseListFragment;
 
 /**
@@ -17,16 +18,16 @@ public abstract class SimpleListFragment<T> extends BaseListFragment<T> {
 
     @Override
     public View createContentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return null;
+        return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
     public RecyclerView createRecyclerView(View contentView) {
-        return null;
+        return (RecyclerView) contentView.findViewById(R.id.recycler_view);
     }
 
     @Override
     public SwipeRefreshLayout createSwipeRefreshLayout(View contentView) {
-        return null;
+        return (SwipeRefreshLayout) contentView.findViewById(R.id.swipe_layout);
     }
 }

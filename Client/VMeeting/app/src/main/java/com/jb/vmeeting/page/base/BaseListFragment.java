@@ -33,7 +33,6 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
     protected PageInfo curPage;
 
     private boolean isRefreshing = false;
-    private boolean isLoadMore = false;
 
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +55,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
 
     public void setRefreshPresenter(BaseRefreshablePresenter<T> presenter) {
         this.presenter = presenter;
-        this.presenter.setRefreshableView(this);
+//        this.presenter.setRefreshableView(this);
     }
 
     public void setSwipeRefreshLayout(SwipeRefreshLayout refreshLayout) {
@@ -87,12 +86,12 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (!isLoadMore && dy > 0) {
+                if (!isRefreshing && dy > 0 && curPage != null && curPage.isHasNext()) {
                     int lastVisiblePosition = ViewUtils.getLastVisiblePosition(recyclerView);
                     if (lastVisiblePosition + 1 == adapter.getItemCount()) { // 滑动到了底端，自动加载更多
-                        isLoadMore = true;
+                        isRefreshing = true;
                         //TODO 显示加载更多的页面提示
-                        presenter.loadMore(curPage.getTotalDataNumCurPage(), RoomService.LIMIT_DEFINED_BY_SERVLET);
+                        presenter.loadMore(curPage.getCurPage() + 1, RoomService.LIMIT_DEFINED_BY_SERVLET);
                     }
                 }
             }
@@ -156,7 +155,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
         if (swipeRefreshLayout == null) {
             throw new RuntimeException("Please call setSwipeRefreshLayout when setup views");
         }
-        isLoadMore = false;
+        isRefreshing = false;
         swipeRefreshLayout.setRefreshing(false);
     }
 

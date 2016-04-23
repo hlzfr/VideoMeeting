@@ -117,6 +117,10 @@ public abstract class ArrayAdapter<T> extends RecyclerView.Adapter<SimpleViewHol
         return mObjects.get(position);
     }
 
+    @Override
+    public int getItemCount() {
+        return mObjects.size();
+    }
 
     public long getItemId(int position) {
         return position;
