@@ -10,6 +10,11 @@
     <string name="action_settings">Settings</string>
     <string name="action_create_room">Create Room</string>
 
+    <!-- main bottom navigation-->
+    <string name="nav_main_rooms">Rooms</string>
+    <string name="nav_main_mine">Mine</string>
+    <string name="nav_main_person">Person</string>
+
     <!-- tip message -->
     <string name="no_access">not login</string>
 

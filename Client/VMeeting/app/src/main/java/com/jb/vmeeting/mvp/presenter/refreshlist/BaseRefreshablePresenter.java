@@ -69,7 +69,7 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
     }
 
     public void loadMoreSuccess(Page<T> page) {
-        isLoading = true;
+        isLoading = false;
         curPage = page.getPageInfo();
         if (mView != null) {
             mView.onLoadMoreSuccess(page);
@@ -78,7 +78,7 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
     }
 
     public void loadMoreFailed(int code, String message) {
-        isLoading = true;
+        isLoading = false;
         if (mView != null) {
             mView.onLoadMoreFailed(code, message);
             mView.onLoadMoreFinish();

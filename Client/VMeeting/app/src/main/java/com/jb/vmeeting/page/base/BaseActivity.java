@@ -2,15 +2,22 @@ package com.jb.vmeeting.page.base;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.jb.vmeeting.app.constant.IntentConstant;
 import com.jb.vmeeting.mvp.presenter.PresenterLifeTime;
+import com.jb.vmeeting.tools.L;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -32,6 +39,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         setupListener();
         // 对intent的处理可能涉及到视图,所以要在initViews之后调用
         handleIntent(intent);
+    }
+
+    /**
+     * 是否需要通过注释super.onSaveInstanceState来解决fragment的getActivity为空的问题？
+     * 若使用{@link #switchFragment(int, String, CreateFragmentCallback)}，
+     * 由于findFragmentByTag，所以似乎不会有该问题？不确定
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     protected abstract void initViews(Bundle savedInstanceState);
@@ -125,29 +142,53 @@ public abstract class BaseActivity extends AppCompatActivity {
         return (T) super.findViewById(id);
     }
 
-    Fragment mCurFragment;
+    protected Fragment mCurFragment;
 
-    public void switchFragment(@NonNull int fContentId, String tag, @NonNull CreateFragmentCallback callback) {
-        Fragment to = getSupportFragmentManager().findFragmentByTag(tag);
+    public void switchFragment(@NonNull int fContentId,@NonNull String tag, @NonNull CreateFragmentCallback callback) {
+        String newTag = makeFragmentName(fContentId, tag);
+        Fragment to = callback.getFragmentManager(this, tag).findFragmentByTag(newTag);
         if (to == null) {
+            L.d("create fragment " + tag);
             to = callback.onCreateFragment(tag);
         }
         if (mCurFragment != to) {
-            FragmentTransaction transaction = callback.onGetTransaction(this);
-            if (!to.isAdded()) {    // 先判断是否被add过
-                transaction.hide(mCurFragment).add(fContentId, to).commit(); // 隐藏当前的fragment，add下一个到Activity中
-            } else {
-                transaction.hide(mCurFragment).show(to).commit(); // 隐藏当前的fragment，显示下一个
+            FragmentTransaction transaction = callback.onGetTransaction(this, tag);
+            if (mCurFragment == null) {
+                List<Fragment> fragments = callback.getFragmentManager(this, tag).getFragments();
+                if (fragments != null) { // 是内存重启
+                    for (int i = 0; i < fragments.size(); i++) {
+                        L.d("hide all fragments");
+                        transaction.hide(fragments.get(i));
+                    }
+                }
             }
+            if (!to.isAdded()) {    // 先判断是否被add过
+                if (mCurFragment != null) {
+                    transaction.hide(mCurFragment);
+                }
+                L.d("add fragment " + tag);
+                transaction.add(fContentId, to, newTag).commit(); // 隐藏当前的fragment，add下一个到Activity中
+            } else {
+                if (mCurFragment != null) {
+                    transaction.hide(mCurFragment);
+                }
+                L.d("show fragment " + tag);
+                transaction.show(to).commit(); // 隐藏当前的fragment，显示下一个
+            }
+//            callback.getFragmentManager(this, tag).executePendingTransactions();
             mCurFragment = to;
-            transaction.commit();
+        } else {
+            L.d("mCurFragment == to");
         }
     }
 
-    public static abstract class CreateFragmentCallback {
-        FragmentTransaction onGetTransaction(BaseActivity activity) {
-            return activity.getSupportFragmentManager().beginTransaction();
-        }
-        abstract BaseFragment onCreateFragment(String tag);
+    public interface CreateFragmentCallback {
+        FragmentManager getFragmentManager(BaseActivity activity, String tag);
+        FragmentTransaction onGetTransaction(BaseActivity activity, String tag);
+        BaseFragment onCreateFragment(String tag);
+    }
+
+    private static String makeFragmentName(int viewId, String tag) {
+        return "base_activity:switcher:" + viewId + ":" + tag;
     }
 }

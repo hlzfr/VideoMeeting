@@ -1,13 +1,15 @@
 package com.jb.vmeeting.page.base;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jb.vmeeting.app.App;
 import com.jb.vmeeting.mvp.model.apiservice.RoomService;
 import com.jb.vmeeting.mvp.model.entity.Page;
 import com.jb.vmeeting.mvp.model.entity.PageInfo;
@@ -33,6 +35,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
     protected PageInfo curPage;
 
     private boolean isRefreshing = false;
+    private boolean isLoadMore = false;
 
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,6 +43,13 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
         setRefreshPresenter(createPresenter(v));
         setSwipeRefreshLayout(createSwipeRefreshLayout(v));
         setRecyclerView(createRecyclerView(v), createAdapter(v));
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(true);
+                onRefresh();
+            }
+        });
         return v;
     }
 
@@ -60,11 +70,15 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
 
     public void setSwipeRefreshLayout(SwipeRefreshLayout refreshLayout) {
         this.swipeRefreshLayout = refreshLayout;
-        this.swipeRefreshLayout.setColorSchemeColors(android.R.color.holo_blue_light);
+        int colorBlue = ContextCompat.getColor(App.getInstance(), android.R.color.holo_blue_light);
+        this.swipeRefreshLayout.setColorSchemeColors(colorBlue, colorBlue, colorBlue);
         this.swipeRefreshLayout.setOnRefreshListener(this);
     }
 
     public void setRecyclerView(RecyclerView recyclerView, ArrayAdapter<T> adapter) {
+        if (recyclerView.getLayoutManager() == null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        }
         bindLoadMoreListener(recyclerView);
         recyclerView.setAdapter(adapter);
         setAdapter(adapter);
@@ -86,10 +100,10 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (!isRefreshing && dy > 0 && curPage != null && curPage.isHasNext()) {
+                if (!isRefreshing && !isLoadMore && dy > 0 && curPage != null && curPage.isHasNext()) {
                     int lastVisiblePosition = ViewUtils.getLastVisiblePosition(recyclerView);
-                    if (lastVisiblePosition + 1 == adapter.getItemCount()) { // 滑动到了底端，自动加载更多
-                        isRefreshing = true;
+                    if (lastVisiblePosition + getAheadCountLoadMore() >= adapter.getItemCount()) { // 提前10个数据就开始自动加载更多
+                        isLoadMore = true;
                         //TODO 显示加载更多的页面提示
                         presenter.loadMore(curPage.getCurPage() + 1, RoomService.LIMIT_DEFINED_BY_SERVLET);
                     }
@@ -98,12 +112,24 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
         });
     }
 
+    /**
+     * 返回提前多少个数据开始进行加载更多
+     * @return
+     */
+    public int getAheadCountLoadMore() {
+        return 10;
+    }
+
     @Override
     public void onRefresh() {
         if (presenter == null) {
             throw new RuntimeException("please call setRefreshPresenter in onCreate or onCreateView");
         }
         if (isRefreshing) {
+            return;
+        }
+        if (isLoadMore) {
+            swipeRefreshLayout.setRefreshing(false);
             return;
         }
         isRefreshing = true;
@@ -155,7 +181,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
         if (swipeRefreshLayout == null) {
             throw new RuntimeException("Please call setSwipeRefreshLayout when setup views");
         }
-        isRefreshing = false;
+        isLoadMore = false;
         swipeRefreshLayout.setRefreshing(false);
     }
 
