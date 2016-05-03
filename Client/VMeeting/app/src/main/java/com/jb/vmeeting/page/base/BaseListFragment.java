@@ -1,6 +1,7 @@
 package com.jb.vmeeting.page.base;
 
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,15 +11,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jb.vmeeting.app.App;
+import com.jb.vmeeting.app.constant.APIConstant;
+import com.jb.vmeeting.app.constant.NETCODE;
 import com.jb.vmeeting.mvp.model.apiservice.RoomService;
 import com.jb.vmeeting.mvp.model.entity.Page;
 import com.jb.vmeeting.mvp.model.entity.PageInfo;
+import com.jb.vmeeting.mvp.model.eventbus.event.RefreshEvent;
 import com.jb.vmeeting.mvp.presenter.refreshlist.BaseRefreshablePresenter;
 import com.jb.vmeeting.mvp.view.IRefreshableListView;
 import com.jb.vmeeting.page.adapter.recyclerview.ArrayAdapter;
 import com.jb.vmeeting.page.adapter.recyclerview.SimpleViewHolder;
 import com.jb.vmeeting.page.utils.ToastUtil;
 import com.jb.vmeeting.utils.ViewUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * 封装有下拉刷新功能的list fragment
@@ -30,6 +38,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
 
     protected BaseRefreshablePresenter<T> presenter;
     protected SwipeRefreshLayout swipeRefreshLayout;
+    protected RecyclerView recyclerView;
     protected ArrayAdapter<T> adapter;
 
     protected PageInfo curPage;
@@ -38,11 +47,22 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
     private boolean isLoadMore = false;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = createContentView(inflater, container, savedInstanceState);
         setRefreshPresenter(createPresenter(v));
         setSwipeRefreshLayout(createSwipeRefreshLayout(v));
         setRecyclerView(createRecyclerView(v), createAdapter(v));
+        refresh();
+        return v;
+    }
+
+    public void refresh() {
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -50,7 +70,6 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
                 onRefresh();
             }
         });
-        return v;
     }
 
     public abstract View createContentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
@@ -65,6 +84,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
 
     public void setRefreshPresenter(BaseRefreshablePresenter<T> presenter) {
         this.presenter = presenter;
+        bindPresenterLifeTime(this.presenter);
 //        this.presenter.setRefreshableView(this);
     }
 
@@ -76,6 +96,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
     }
 
     public void setRecyclerView(RecyclerView recyclerView, ArrayAdapter<T> adapter) {
+        this.recyclerView = recyclerView;
         if (recyclerView.getLayoutManager() == null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         }
@@ -90,6 +111,9 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
         this.adapter.setOnItemClickListener(this);
     }
 
+    public ArrayAdapter<T> getAdapter() {
+        return adapter;
+    }
     private void bindLoadMoreListener(RecyclerView recyclerView) {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -104,8 +128,8 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
                     int lastVisiblePosition = ViewUtils.getLastVisiblePosition(recyclerView);
                     if (lastVisiblePosition + getAheadCountLoadMore() >= adapter.getItemCount()) { // 提前10个数据就开始自动加载更多
                         isLoadMore = true;
-                        //TODO 显示加载更多的页面提示
-                        presenter.loadMore(curPage.getCurPage() + 1, RoomService.LIMIT_DEFINED_BY_SERVLET);
+                        //TODO show tips about load more显示加载更多的页面提示
+                        presenter.loadMore(curPage.getCurPage() + 1, APIConstant.LIMIT_DEFINED_BY_SERVLET);
                     }
                 }
             }
@@ -136,6 +160,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
         presenter.refresh();
     }
 
+    @CallSuper
     @Override
     public void onRefreshSuccess(Page<T> page) {
         if (adapter == null) {
@@ -148,7 +173,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
     }
 
     @Override
-    public void onRefreshFailed(int code, String message) {
+    public void onRefreshFailed(int statusCode, int code, String message) {
         ToastUtil.toast("refresh failed. code:" + code + "; msg:" + message);
     }
 
@@ -172,7 +197,7 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
     }
 
     @Override
-    public void onLoadMoreFailed(int code, String message) {
+    public void onLoadMoreFailed(int statusCode, int code, String message) {
         ToastUtil.toast("refresh failed. code:" + code + "; msg:" + message);
     }
 
@@ -185,9 +210,17 @@ public abstract class BaseListFragment<T> extends BaseFragment implements SwipeR
         swipeRefreshLayout.setRefreshing(false);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNeedRefresh(RefreshEvent refreshEvent) {
+        if (refreshEvent.needRefresh != null && refreshEvent.needRefresh.contains(this.getClass().getSimpleName())) {
+            refresh();
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         presenter.setRefreshableView(null);
     }
 }

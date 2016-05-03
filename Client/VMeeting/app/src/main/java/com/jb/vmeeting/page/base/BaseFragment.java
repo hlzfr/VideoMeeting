@@ -90,6 +90,7 @@ public abstract class BaseFragment extends Fragment {
         super.onDestroy();
         if (this.pLife != null) {
             this.pLife.onDestroy();
+            this.pLife = null;
         }
     }
 }

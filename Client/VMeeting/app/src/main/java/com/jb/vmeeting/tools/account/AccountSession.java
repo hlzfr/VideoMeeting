@@ -1,6 +1,9 @@
 package com.jb.vmeeting.tools.account;
 
+import com.jb.vmeeting.app.App;
 import com.jb.vmeeting.mvp.model.entity.User;
+import com.jb.vmeeting.tools.storage.ACache;
+import com.jb.vmeeting.tools.task.TaskExecutor;
 
 /**
  * 帐号会话, 用于保存帐号相关信息
@@ -22,8 +25,14 @@ public class AccountSession {
      * 只能通过AccountManager执行相关操作后设置
      */
     void setCurrentUser(User user) {
-        // TODO save user in local
         mCurrentUser = user;
+        // 文件操作在子线程执行
+        TaskExecutor.executeTask(new Runnable() {
+            @Override
+            public void run() {
+                ACache.get(App.getInstance()).put("user", mCurrentUser);
+            }
+        });
     }
 
     /**
@@ -40,7 +49,9 @@ public class AccountSession {
      * @return
      */
     private User getUser() {
-        //TODO try to get from local if user don't exist in memory
+        if (mCurrentUser == null) {
+            mCurrentUser = (User) ACache.get(App.getInstance()).getAsObject("user");
+        }
         return mCurrentUser;
     }
 

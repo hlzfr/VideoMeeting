@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView  android:layout_width="match_parent"
+                 android:layout_height="match_parent" >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/edt_create_room_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="输入房间名字" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/edt_create_room_start_time"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:layout_height="wrap_content"
+                    android:hint="请选择会议开始时间"
+                    android:enabled="false" />
+                <Button
+                    android:id="@+id/btn_create_room_choose_start_time"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="开始时间"
+                    android:onClick="chooseStartTime"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/edt_create_room_end_time"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:layout_height="wrap_content"
+                    android:hint="请选择会议结束时间"
+                    android:enabled="false" />
+                <Button
+                    android:id="@+id/btn_create_room_choose_end_time"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:onClick="chooseEndTime"
+                    android:text="结束时间"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edt_create_room_describe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="输入房间描述"/>
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="会议参与者"/>
+
+            <include layout="@layout/line"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_create_room_parner_empty"
+                    android:layout_margin="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="暂无"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listview_create_room_parner"
+                    android:layout_width="match_parent"
+                    android:overScrollMode="never"
+                    android:layout_height="wrap_content" />
+            </FrameLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="添加参与者"
+                android:onClick="addParticipator"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="确定"
+                android:onClick="updateRoom"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

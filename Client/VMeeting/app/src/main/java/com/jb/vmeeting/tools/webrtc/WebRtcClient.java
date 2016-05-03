@@ -326,10 +326,16 @@ public class WebRtcClient {
         for (Peer peer : peers.values()) {
             peer.pc.dispose();
         }
-        videoSource.dispose();
-        factory.dispose();
-        client.disconnect();
-        client.close();
+//        if (videoSource != null) {
+//            videoSource.dispose();
+//        }
+        if (factory != null) {
+            factory.dispose();
+        }
+        if (client != null) {
+            client.disconnect();
+            client.close();
+        }
     }
 
     private int findEndPoint() {

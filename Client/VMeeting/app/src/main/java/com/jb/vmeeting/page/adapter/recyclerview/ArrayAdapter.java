@@ -44,7 +44,7 @@ public abstract class ArrayAdapter<T> extends RecyclerView.Adapter<SimpleViewHol
 
     @Override
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        SimpleViewHolder simpleViewHolder = new SimpleViewHolder(onCreateItemView(parent, viewType));
+        SimpleViewHolder simpleViewHolder = new SimpleViewHolder(onCreateItemView(parent, viewType), viewType);
         simpleViewHolder.setOnItemClickListener(this);
         simpleViewHolder.setOnItemLongClickListener(this);
         return simpleViewHolder;
@@ -107,6 +107,10 @@ public abstract class ArrayAdapter<T> extends RecyclerView.Adapter<SimpleViewHol
             mObjects.clear();
         }
         if (mNotifyOnChange) notifyDataSetChanged();
+    }
+
+    public List<T> getData() {
+        return mObjects;
     }
 
     public int getCount() {

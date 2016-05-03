@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="white">#fff</color>
+
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorPrimaryBg">#eee</color>
+
+    <color name="tool_bar">#38393e</color>
+
+    <color name="bottom_bar_active">#379891</color>
+    <!--<color name="bottom_bar_active">#38393e</color>-->
+
+    <color name="appBg">#eee</color>
+
+    <color name="text_primary">#222</color>
+    <color name="text_sub">#808080</color>
+
+    <color name="line">#eee</color>
 </resources>

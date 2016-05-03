@@ -8,12 +8,24 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 
+import com.jb.vmeeting.R;
 import com.jb.vmeeting.app.constant.IntentConstant;
+import com.jb.vmeeting.mvp.model.eventbus.event.LoginEvent;
+import com.jb.vmeeting.mvp.model.eventbus.event.LogoutEvent;
+import com.jb.vmeeting.mvp.model.eventbus.event.UserUpdateEvent;
 import com.jb.vmeeting.mvp.presenter.PresenterLifeTime;
+import com.jb.vmeeting.page.utils.PageNavigator;
 import com.jb.vmeeting.tools.L;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,10 +40,43 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private Bundle mBundle;
     private PresenterLifeTime pLife;
+    protected boolean LOG_LIFE_TIME = false; // 是否打印生命周期
+
+    public void setupToolBar(String title) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (!TextUtils.isEmpty(title) && toolbar != null) {
+            toolbar.setTitle(title);
+        }
+        setSupportActionBar(toolbar);
+    }
+
+    public void setupToolBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+
+    public void setToolBarCanBack() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
+        if (toolbar != null) {
+//            toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+            // toolbar.setNavigationOnClickListener 要在 setSupportActionBar之后设置才能生效
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+        }
+    }
 
     @CallSuper
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onCreate");
+        }
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         mBundle = intent.getBundleExtra(IntentConstant.INTENT_EXTRA_BUNDLE);
@@ -39,6 +84,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         setupListener();
         // 对intent的处理可能涉及到视图,所以要在initViews之后调用
         handleIntent(intent);
+
+        EventBus.getDefault().register(this);
+    }
+
+    public void logLifeTime(boolean log) {
+        LOG_LIFE_TIME = log;
     }
 
     /**
@@ -72,6 +123,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     @CallSuper
     @Override
     protected void onNewIntent(Intent intent) {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onNewIntent");
+        }
         super.onNewIntent(intent);
         setIntent(intent);
         mBundle = intent.getBundleExtra(IntentConstant.INTENT_EXTRA_BUNDLE);
@@ -79,13 +133,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private void handleIntent(Intent intent) {
-        if (null != intent) {
-            onHandleIntent(intent, mBundle);
-        }
+//        if (null != intent) {
+        onHandleIntent(intent, mBundle);
+//        }
     }
 
     @Override
     protected void onStart() {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onStart");
+        }
         super.onStart();
         if (this.pLife != null) {
             this.pLife.onStart();
@@ -94,6 +151,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onRestart() {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onRestart");
+        }
         super.onRestart();
         if (this.pLife != null) {
             this.pLife.onRestart();
@@ -102,6 +162,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onResume");
+        }
         super.onResume();
         if (this.pLife != null) {
             this.pLife.onResume();
@@ -110,6 +173,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onPause");
+        }
         super.onPause();
         if (this.pLife != null) {
             this.pLife.onPause();
@@ -118,19 +184,42 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onStop");
+        }
         super.onStop();
         if (this.pLife != null) {
             this.pLife.onStop();
         }
     }
 
+    @CallSuper
     @Override
     protected void onDestroy() {
+        if (LOG_LIFE_TIME) {
+            L.d(getClass().getSimpleName() + " onDestroy");
+        }
         super.onDestroy();
         if (this.pLife != null) {
             this.pLife.onDestroy();
             this.pLife = null;
         }
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLoginEvent(LoginEvent loginEvent) {
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLogoutEvent(LogoutEvent logoutEvent) {
+//        PageNavigator.getInstance().toMainActivity(this, true);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUserUpdate(UserUpdateEvent updateEvent) {
+
     }
 
     protected Bundle getBundle() {

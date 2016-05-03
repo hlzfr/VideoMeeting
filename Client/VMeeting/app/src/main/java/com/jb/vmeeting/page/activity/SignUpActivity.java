@@ -28,14 +28,14 @@ public class SignUpActivity extends BaseActivity implements ISignUpView{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSignUpPresenter = new SignUpPresenter(this);
+        bindPresenterLifeTime(mSignUpPresenter);
     }
-
 
     @Override
     protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_sign_up);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setupToolBar();
+        setToolBarCanBack();
 
         edtUsername = findView(R.id.edt_signUp_username);
         edtPassword = findView(R.id.edt_signUp_password);
@@ -77,11 +77,12 @@ public class SignUpActivity extends BaseActivity implements ISignUpView{
         ToastUtil.toast("onSignUpSuccess");
         L.d("onSignUpSuccess");
         //TODO cancel login waiting view
+        finish();
     }
 
     @Override
     public void onSignUpFailed(String msg) {
-        ToastUtil.toast("onSignUpFailed");
+        ToastUtil.toast(msg);
         L.e("onSignUpFailed " + msg);
         //TODO cancel login waiting view
     }

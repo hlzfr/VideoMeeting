@@ -11,7 +11,7 @@ import org.greenrobot.eventbus.ThreadMode;
 /**
  * Created by Jianbin on 16/3/14.
  */
-public class SignUpPresenter {
+public class SignUpPresenter extends BasePresenter{
     ISignUpView signUpView;
 
     public SignUpPresenter(ISignUpView signUpView) {

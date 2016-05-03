@@ -2,6 +2,7 @@ package com.jb.vmeeting.mvp.presenter;
 
 import android.graphics.Point;
 import android.opengl.GLSurfaceView;
+import android.text.TextUtils;
 
 import com.jb.vmeeting.R;
 import com.jb.vmeeting.app.App;
@@ -20,7 +21,7 @@ import org.webrtc.VideoRendererGui;
  * 房间聊天
  * Created by Jianbin on 2016/4/16.
  */
-public class RoomChatPresenter implements WebRtcClient.RtcListener, PresenterLifeTime{
+public class RoomChatPresenter extends BasePresenter implements WebRtcClient.RtcListener, PresenterLifeTime{
     private static final String VIDEO_CODEC_VP9 = "VP9";
     private static final String AUDIO_CODEC_OPUS = "opus";
 

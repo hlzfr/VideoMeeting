@@ -3,12 +3,15 @@
     <string name="stream_port">3000</string>
 
     <string name="common_base_url">http://192.168.1.103:80/VCCommon/</string>
+    <string name="file_base_url">http://192.168.1.103:80/file/</string>
 
     <string name="app_name">VMeeting</string>
 
     <!-- toolbar option -->
     <string name="action_settings">Settings</string>
     <string name="action_create_room">Create Room</string>
+    <string name="action_room_detail">Room Detail</string>
+    <string name="action_complete">Complete</string>
 
     <!-- main bottom navigation-->
     <string name="nav_main_rooms">Rooms</string>
@@ -22,12 +25,24 @@
     <string name="title_login">Login</string>
     <string name="title_sign_up">Sign Up</string>
     <string name="title_video_chat">Chat</string>
-
+    <string name="title_user_modify">My Info</string>
+    <string name="title_room_create">Create Room</string>
 
     <!-- text on view -->
     <string name="text_login">Login</string>
+    <string name="text_logout">Log Out</string>
     <string name="text_sign_up">Sign Up</string>
     <string name="text_video_chat">Video Chat</string>
     <string name="text_start">Start</string>
+    <string name="text_not_login">Not Login</string>
+
+    <string name="text_user_modify_username">Username: %s</string>
+    <string name="text_user_modify_avatar">Avatar</string>
+    <string name="text_user_modify_nickname">Nick Name</string>
+
+    <string name="text_person_about">About</string>
+    <string name="text_person_feedback">Feed Back</string>
+
+    <string name="text_upload_failed">Upload Failed</string>
 
 </resources>

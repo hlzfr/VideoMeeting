@@ -8,7 +8,9 @@ import com.jb.vmeeting.mvp.model.apiservice.AccountService;
 import com.jb.vmeeting.mvp.model.entity.Result;
 import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.model.eventbus.event.LoginEvent;
+import com.jb.vmeeting.mvp.model.eventbus.event.LogoutEvent;
 import com.jb.vmeeting.mvp.model.eventbus.event.SignUpEvent;
+import com.jb.vmeeting.mvp.model.eventbus.event.UserUpdateEvent;
 import com.jb.vmeeting.mvp.model.helper.AuthCookie;
 import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
 import com.jb.vmeeting.mvp.model.helper.SimpleCallback;
@@ -47,7 +49,18 @@ public class AccountManager {
     public void logout() {
         AccountSession.getAccountSession().setCurrentUser(null);
         AuthCookie.clear();
-        mAccountService.logout().enqueue(null);
+        mAccountService.logout().enqueue(new Callback<Result<Void>>() {
+            @Override
+            public void onResponse(Call<Result<Void>> call, Response<Result<Void>> response) {
+                // do nothing
+            }
+
+            @Override
+            public void onFailure(Call<Result<Void>> call, Throwable throwable) {
+                // do nothing
+            }
+        });
+        EventBus.getDefault().post(new LogoutEvent());
     }
 
     /**
@@ -92,10 +105,33 @@ public class AccountManager {
         });
     }
 
+    public void updateUserInfo(User user) {
+        mAccountService.update(user).enqueue(new SimpleCallback<User>() {
+            @Override
+            public void onSuccess(int statusCode, Result<User> result) {
+                AccountSession.getAccountSession().setCurrentUser(result.body);
+                EventBus.getDefault().post(new UserUpdateEvent(result.success, result.message, AccountSession.getAccountSession().getCurrentUser()));
+            }
+
+            @Override
+            public void onFailed(int statusCode, Result<User> result) {
+                EventBus.getDefault().post(new UserUpdateEvent(result.success, result.message, result.body));
+            }
+        });
+    }
+
+    /**
+     *
+     * @return true has login
+     */
     public boolean checkLogin() {
         return getAccountSession().hasLogin();
     }
 
+    /**
+     *
+     * @return true has login
+     */
     public boolean checkLogin(Context ctx, boolean toLoginPageIfNotLogin, boolean toastMessageIfNotLogin) {
         boolean hasLogin = checkLogin();
         if (!hasLogin) {
@@ -103,7 +139,7 @@ public class AccountManager {
                 ToastUtil.toast(R.string.no_access);
             }
             if (toLoginPageIfNotLogin) {
-                PageNavigator.getInstance().toLoginActivity(ctx);
+                PageNavigator.getInstance().toLoginActivity(ctx, true);
             }
         }
         return hasLogin;

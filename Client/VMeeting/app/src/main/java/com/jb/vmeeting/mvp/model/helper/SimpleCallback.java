@@ -2,8 +2,11 @@ package com.jb.vmeeting.mvp.model.helper;
 
 import android.text.TextUtils;
 
+import com.jb.vmeeting.app.constant.NETCODE;
 import com.jb.vmeeting.mvp.model.entity.Result;
+import com.jb.vmeeting.page.utils.PageNavigator;
 import com.jb.vmeeting.tools.L;
+import com.jb.vmeeting.tools.account.AccountManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -14,13 +17,13 @@ import retrofit2.Response;
  */
 public abstract class SimpleCallback<T> implements Callback<Result<T>> {
 
-    public static final int ERR_LOCAL = -1;
 
     @Override
     public void onResponse(Call<Result<T>> call, Response<Result<T>> response) {
         Result<T> result = response.body();
         int statusCode = response.code();
         if (result != null) {
+            result.statusCode = statusCode;
             if (result.success) {
                 L.i(statusCode+" success result " + result.toString());
                 onSuccess(statusCode, result);
@@ -35,10 +38,14 @@ public abstract class SimpleCallback<T> implements Callback<Result<T>> {
             }
             result = new Result<>();
             result.success = false;
-            result.code = ERR_LOCAL;
+            result.code = NETCODE.RESULT.CODE_RESULT_EMPTY;
+            result.statusCode = statusCode;
             result.message = errMsg;
             L.e(statusCode+" failed result " + result.toString());
             onFailed(statusCode, result);
+        }
+        if (result.code == NETCODE.RESULT.CODE_LOGIN_NEED) {
+            AccountManager.getInstance().logout();
         }
     }
 
@@ -46,10 +53,11 @@ public abstract class SimpleCallback<T> implements Callback<Result<T>> {
     public void onFailure(Call<Result<T>> call, Throwable t) {
         Result<T> result = new Result<>();
         result.success = false;
-        result.code = ERR_LOCAL;
+        result.code = NETCODE.RESULT.ERR_LOCAL;
+        result.statusCode = NETCODE.STATUS.ERR_LOCAL;
         result.message = t.getMessage();
         L.e("status code none. failed result " + result.toString());
-        onFailed(ERR_LOCAL, result);
+        onFailed(result.statusCode, result);
     }
 
     public abstract void onSuccess(int statusCode, Result<T> result);

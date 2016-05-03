@@ -1,5 +1,6 @@
 package com.jb.vmeeting.mvp.presenter;
 
+import com.jb.vmeeting.app.constant.APIConstant;
 import com.jb.vmeeting.mvp.model.apiservice.RoomService;
 import com.jb.vmeeting.mvp.model.entity.Page;
 import com.jb.vmeeting.mvp.model.entity.Result;
@@ -8,6 +9,7 @@ import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
 import com.jb.vmeeting.mvp.model.helper.SimpleCallback;
 import com.jb.vmeeting.mvp.presenter.refreshlist.BaseRefreshablePresenter;
 import com.jb.vmeeting.mvp.view.IRefreshableListView;
+import com.jb.vmeeting.tools.L;
 
 /**
  * Created by Jianbin on 2016/4/21.
@@ -22,15 +24,15 @@ public class RoomListPresenter extends BaseRefreshablePresenter<Room> {
 
     @Override
     public void refreshData() {
-        roomService.getRoomList(1, RoomService.LIMIT_DEFINED_BY_SERVLET).enqueue(new SimpleCallback<Page<Room>>() {
+        roomService.getRoomList(1, APIConstant.LIMIT_DEFINED_BY_SERVLET).enqueue(new SimpleCallback<Page<Room>>() {
             @Override
-            public void onSuccess(int statusCode, Result<Page<Room>> resultt) {
-                refreshSuccess(resultt.body);
+            public void onSuccess(int statusCode, Result<Page<Room>> result) {
+                refreshSuccess(result.body);
             }
 
             @Override
             public void onFailed(int statusCode, Result<Page<Room>> result) {
-                refreshFailed(statusCode, result.message);
+                refreshFailed(statusCode, result.code, result.message);
             }
         });
     }
@@ -45,7 +47,7 @@ public class RoomListPresenter extends BaseRefreshablePresenter<Room> {
 
             @Override
             public void onFailed(int statusCode, Result<Page<Room>> result) {
-                loadMoreFailed(statusCode, result.message);
+                loadMoreFailed(statusCode,  result.code, result.message);
             }
         });
     }

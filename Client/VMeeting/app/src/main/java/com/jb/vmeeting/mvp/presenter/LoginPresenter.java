@@ -11,35 +11,38 @@ import org.greenrobot.eventbus.ThreadMode;
 /**
  * Created by Jianbin on 16/3/14.
  */
-public class LoginPresenter {
+public class LoginPresenter extends BasePresenter {
     ILoginView loginView;
 
     public LoginPresenter(ILoginView loginView) {
         this.loginView = loginView;
-        EventBus.getDefault().register(this);
     }
 
     public void login() {
-        loginView.preLogin();
-        AccountManager.getInstance().login(loginView.getUsername(), loginView.getPassword());
+        if (loginView != null) {
+            loginView.preLogin();
+            AccountManager.getInstance().login(loginView.getUsername(), loginView.getPassword());
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLoginEvent(LoginEvent loginEvent) {
-        if (loginEvent.success) {
-            loginView.onLoginSuccess(loginEvent.user);
-        } else {
-            loginView.onLoginFailed(loginEvent.msg);
+        if (loginView != null) {
+            if (loginEvent.success) {
+                loginView.onLoginSuccess(loginEvent.user);
+            } else {
+                loginView.onLoginFailed(loginEvent.msg);
+            }
         }
-    }
-
-    /**
-     * should call it when activity is about to be destroyed(Activity.onDestroy),
-     * or memory leak may happens.
-     *
-     * Release obj here if necessary.
-     */
-    public void destroy() {
-        EventBus.getDefault().unregister(this);
     }
 }

@@ -20,7 +20,7 @@ import com.jb.vmeeting.utils.SystemUtils;
  * Created by Jianbin on 16/3/15.
  */
 @Deprecated
-public class VideoChatPresenter implements Session.SessionCallBack, RtspClient.Callback{
+public class VideoChatPresenter extends BasePresenter implements Session.SessionCallBack, RtspClient.Callback{
     IVideoChatBiz videoChatBiz;
     IVideoChatView videoChatView;
 

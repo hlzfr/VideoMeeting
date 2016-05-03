@@ -14,7 +14,7 @@ import com.jb.vmeeting.utils.ViewUtils;
 
 /**
  * 修复 Android4.1.x 上的点击穿透问题
- * TODO 还未测试
+ * TODO to test 还未测试
  * Created by Jianbin on 2016/4/24.
  */
 public abstract class FixedFragmentPageAdapter extends FragmentPagerAdapter {

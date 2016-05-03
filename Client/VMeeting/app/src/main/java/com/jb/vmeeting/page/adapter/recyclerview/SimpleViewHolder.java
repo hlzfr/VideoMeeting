@@ -9,10 +9,16 @@ import android.view.View;
  */
 public class SimpleViewHolder extends RecyclerView.ViewHolder{
 
+    private int viewType;
+
     SparseArray<View> viewCache;
     OnItemClickListener onItemClickListener;
     OnItemLongClickListener onItemLongClickListener;
 
+    public SimpleViewHolder(View itemView, int viewType) {
+        this(itemView);
+        this.viewType = viewType;
+    }
     public SimpleViewHolder(View itemView) {
         super(itemView);
         itemView.setOnClickListener(new View.OnClickListener() {
@@ -42,6 +48,14 @@ public class SimpleViewHolder extends RecyclerView.ViewHolder{
             viewCache.put(id, v);
         }
         return (T) v;
+    }
+
+    public int getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
     }
 
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {

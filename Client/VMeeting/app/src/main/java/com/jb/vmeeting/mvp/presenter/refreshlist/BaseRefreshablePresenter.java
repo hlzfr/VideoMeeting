@@ -1,14 +1,16 @@
 package com.jb.vmeeting.mvp.presenter.refreshlist;
 
+import com.jb.vmeeting.app.constant.NETCODE;
 import com.jb.vmeeting.mvp.model.entity.Page;
 import com.jb.vmeeting.mvp.model.entity.PageInfo;
 import com.jb.vmeeting.mvp.model.helper.SimpleCallback;
+import com.jb.vmeeting.mvp.presenter.BasePresenter;
 import com.jb.vmeeting.mvp.view.IRefreshableListView;
 
 /**
  * Created by Jianbin on 2016/4/21.
  */
-public abstract class BaseRefreshablePresenter<T> implements RefreshablePresenter {
+public abstract class BaseRefreshablePresenter<T> extends BasePresenter implements RefreshablePresenter {
     IRefreshableListView<T> mView;
     PageInfo curPage;
 
@@ -39,7 +41,7 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
     public void loadMore(int page, int limit) {
         if (!canLoadMore()) {
             if (mView != null) {
-                mView.onLoadMoreFailed(SimpleCallback.ERR_LOCAL, "没有更多");
+                mView.onLoadMoreFailed(NETCODE.STATUS.ERR_LOCAL, NETCODE.RESULT.ERR_LOCAL, "没有更多");
                 mView.onLoadMoreFinish();
             }
             return;
@@ -60,10 +62,10 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
         }
     }
 
-    public void refreshFailed(int code, String message) {
+    public void refreshFailed(int statusCode, int code, String message) {
         isLoading = false;
         if (mView != null) {
-            mView.onRefreshFailed(code, message);
+            mView.onRefreshFailed(statusCode, code, message);
             mView.onRefreshFinish();
         }
     }
@@ -77,15 +79,20 @@ public abstract class BaseRefreshablePresenter<T> implements RefreshablePresente
         }
     }
 
-    public void loadMoreFailed(int code, String message) {
+    public void loadMoreFailed(int statusCode, int code, String message) {
         isLoading = false;
         if (mView != null) {
-            mView.onLoadMoreFailed(code, message);
+            mView.onLoadMoreFailed(statusCode, code, message);
             mView.onLoadMoreFinish();
         }
     }
 
     public boolean canLoadMore() {
         return curPage != null && curPage.isHasNext() && !isLoading;
+    }
+
+    @Override
+    public void onDestroy() {
+        mView = null;
     }
 }

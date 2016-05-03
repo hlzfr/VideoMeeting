@@ -118,6 +118,17 @@ public class DateUtils {
         }
     }
 
+    public static String toDate(Date date, String format) {
+        return toDate(date, new SimpleDateFormat(format, Locale.getDefault()));
+    }
+    public static String toDate(Date date) {
+        return toDate(date, dateFormater.get());
+    }
+
+    public static String toDate(Date date, SimpleDateFormat dateFormater) {
+        return dateFormater.format(date);
+    }
+
     /**
      * 判断用户的设备时区是否为东八区（中国） 2014年7月31日
      *

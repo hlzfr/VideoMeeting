@@ -17,8 +17,6 @@ import retrofit2.http.Query;
  */
 public interface RoomService {
 
-    public static final int LIMIT_DEFINED_BY_SERVLET = -1;
-
     /**
      *
      * @param page
@@ -30,4 +28,7 @@ public interface RoomService {
 
     @POST("room/create")
     Call<Result<Room>> createRoom(@Body Room room);
+
+    @GET("room/page/{page}/{limit}")
+    Call<Result<Page<Room>>> getRoomList(@Path("page")int page, @Path("limit") int limit, @Query("ownerName")String ownerName);
 }

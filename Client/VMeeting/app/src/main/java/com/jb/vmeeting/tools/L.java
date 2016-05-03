@@ -149,7 +149,7 @@ public final class L {
         StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[4];
         String className = stackTrace.getClassName();
         String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
-        String tag = TextUtils.isEmpty(customTag) ? TAG_HEAD + "/" + simpleClassName : TAG_HEAD + "/" + customTag;
+        String tag = TextUtils.isEmpty(customTag) ? TAG_HEAD : TAG_HEAD + "/" + customTag;
         String position = " [("+simpleClassName.split("\\$")[0]+".java:"+stackTrace.getLineNumber()+")#"+stackTrace.getMethodName() +"]";
         return tag + position;
     }

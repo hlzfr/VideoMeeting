@@ -15,4 +15,6 @@ public class Result<T> extends BaseEntity {
     public int code;
     @Expose
     public boolean success = false;
+
+    public int statusCode = 200;
 }

@@ -9,13 +9,13 @@ public interface IRefreshableListView<T> {
 
     void onRefreshSuccess(Page<T> page);
 
-    void onRefreshFailed(int code, String message);
+    void onRefreshFailed(int statusCode, int code, String message);
 
     void onRefreshFinish();
 
     void onLoadMoreSuccess(Page<T> page);
 
-    void onLoadMoreFailed(int code, String message);
+    void onLoadMoreFailed(int statusCode, int code, String message);
 
     void onLoadMoreFinish();
 }

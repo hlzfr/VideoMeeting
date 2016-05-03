@@ -7,12 +7,15 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.jb.vmeeting.R;
+import com.jb.vmeeting.app.App;
 import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.presenter.LoginPresenter;
 import com.jb.vmeeting.mvp.view.ILoginView;
+import com.jb.vmeeting.page.utils.PageNavigator;
 import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.page.base.BaseActivity;
 import com.jb.vmeeting.page.utils.ToastUtil;
+import com.jb.vmeeting.tools.account.AccountManager;
 
 /**
  * 登录页面
@@ -28,13 +31,22 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (AccountManager.getInstance().checkLogin()) {
+            PageNavigator.getInstance().toMainActivity(this);
+            finish();
+            return;
+        }
         mLoginPresenter = new LoginPresenter(this);
+        bindPresenterLifeTime(mLoginPresenter);
     }
 
     @Override
     protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_login);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(App.getInstance().getString(R.string.title_login));
+        }
         setSupportActionBar(toolbar);
         username = findView(R.id.edt_login_username);
         password  = findView(R.id.edt_login_password);
@@ -66,8 +78,10 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         //TODO cancel login waiting view
 //        PageNavigator.getInstance().toMainActivity(this);
 //        finish();
-        ToastUtil.toast("login success!");
+//        ToastUtil.toast("login success!");
         L.d("login success.");
+        PageNavigator.getInstance().toMainActivity(this);
+        finish();
     }
 
     @Override
@@ -87,9 +101,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         return username.getText().toString();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mLoginPresenter.destroy();
+    public void toSignUpActivity(View view) {
+        PageNavigator.getInstance().toSignUpActivity(this);
     }
 }

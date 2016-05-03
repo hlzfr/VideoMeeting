@@ -12,5 +12,4 @@ public class AppConstant {
     public static final String STREAM_SERVER_HOST = "192.168.1.103";
     @Deprecated
     public static final int STREAM_SERVER_PORT = 3000;
-
 }

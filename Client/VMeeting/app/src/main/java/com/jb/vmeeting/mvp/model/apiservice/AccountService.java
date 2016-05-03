@@ -26,4 +26,7 @@ public interface AccountService {
 
     @GET("account/logout")
     Call<Result<Void>> logout();
+
+    @POST("account/update")
+    Call<Result<User>> update(@Body User user);
 }
