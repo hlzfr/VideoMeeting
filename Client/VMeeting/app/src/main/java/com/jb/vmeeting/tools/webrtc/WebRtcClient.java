@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.github.nkzawa.emitter.Emitter;
+import com.google.gson.Gson;
 import com.jb.vmeeting.app.App;
 import com.jb.vmeeting.tools.L;
 
@@ -30,6 +31,10 @@ public class WebRtcClient {
     private RtcListener mListener;
     private Socket client;
 
+    private static Gson sGson = new Gson();
+
+//    private String clientId;
+
     /**
      * Implement this interface to be notified of events.
      */
@@ -43,6 +48,8 @@ public class WebRtcClient {
         void onAddRemoteStream(MediaStream remoteStream, int endPoint);
 
         void onRemoveRemoteStream(int endPoint);
+
+        void onTextReceived(TextMessage message);
     }
 
     /**
@@ -100,6 +107,17 @@ public class WebRtcClient {
         }
     }
 
+    private class TextCommond implements Command {
+
+        @Override
+        public void execute(String peerId, JSONObject payload) throws JSONException {
+            TextMessage message = sGson.fromJson(payload.toString(), TextMessage.class);
+            if (mListener != null) {
+                mListener.onTextReceived(message);
+            }
+        }
+    }
+
     /**
      * 发送消息给特定人员
      *
@@ -116,6 +134,29 @@ public class WebRtcClient {
         client.emit("message", message);
     }
 
+    /**
+     * 给房间里的所有人发消息
+     * @param roomId
+     * @param type
+     * @param payload
+     * @throws JSONException
+     */
+    public void sendMessage2Room(String roomId, String type, JSONObject payload) throws JSONException {
+        JSONObject message = new JSONObject();
+//        message.put("from", clientId);
+        message.put("toRoomId", roomId);
+        message.put("type", type);
+        message.put("payload", payload);
+        client.emit("message2Room", message);
+    }
+
+    public void sendTextMessage2Room(String roomId, TextMessage textMessage) throws JSONException {
+        String payload = sGson.toJson(textMessage);
+        JSONObject payloadJson = new JSONObject(payload);
+        L.d("payload "+payloadJson.toString());
+        sendMessage2Room(roomId, "text", payloadJson);
+    }
+
     private class MessageHandler {
         private HashMap<String, Command> commandMap;
 
@@ -125,6 +166,7 @@ public class WebRtcClient {
             commandMap.put("offer", new CreateAnswerCommand());
             commandMap.put("answer", new SetRemoteSDPCommand());
             commandMap.put("candidate", new AddIceCandidateCommand());
+            commandMap.put("text", new TextCommond()); // 文本聊天信息
         }
 
         private Emitter.Listener onMessage = new Emitter.Listener() {
@@ -161,6 +203,7 @@ public class WebRtcClient {
             @Override
             public void call(Object... args) {
                 String id = (String) args[0];
+//                clientId = id;
                 mListener.onCallReady(id);
             }
         };

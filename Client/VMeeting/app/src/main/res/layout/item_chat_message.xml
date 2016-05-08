@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="#ddffffff"
+              android:gravity="center_vertical"
+              android:padding="10dp">
+    <com.jb.vmeeting.page.custom.CircleImageView
+        android:id="@+id/img_item_chat_avatar"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@mipmap/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/tv_item_chat_content"
+        android:layout_marginLeft="10dp"
+        android:textSize="@dimen/text_size_normal"
+        android:textColor="@color/text_primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="text"/>
+</LinearLayout>

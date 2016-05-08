@@ -37,6 +37,7 @@ public class UserModifyActivity extends BaseActivity {
 
     TextView tvUserName;
     TextView tvNickName;
+    TextView tvPhone;
     ImageView imgAvatar;
     User currentUser;
     boolean hasModified = false; // 是否进行了修改
@@ -52,6 +53,7 @@ public class UserModifyActivity extends BaseActivity {
         tvUserName = ViewUtils.find(this, R.id.tv_user_modify_username);
         tvNickName = ViewUtils.find(this, R.id.tv_user_modify_nickname);
         imgAvatar = ViewUtils.find(this, R.id.img_user_modify_avatar);
+        tvPhone = ViewUtils.find(this, R.id.tv_user_modify_phone);
 
         currentUser = AccountManager.getInstance().getAccountSession().getCurrentUser();
         updateUserInfoUI(currentUser);
@@ -76,6 +78,7 @@ public class UserModifyActivity extends BaseActivity {
             nickName = user.getUsername();
         }
         tvNickName.setText(nickName);
+        tvPhone.setText(user.getPhoneNumber());
         if (!TextUtils.isEmpty(user.getAvatar())) {
             ImageLoader.getInstance().displayImage(App.getInstance().getString(R.string.file_base_url)+user.getAvatar(), imgAvatar);
         }

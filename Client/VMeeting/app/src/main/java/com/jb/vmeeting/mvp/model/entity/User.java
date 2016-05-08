@@ -24,6 +24,9 @@ public class User extends BaseEntity implements Cloneable, Serializable{
     @Expose
     private String avatar;// 头像Url
 
+    @Expose
+    private String phoneNumber;
+
     public String getId() {
         return id;
     }
@@ -50,6 +53,14 @@ public class User extends BaseEntity implements Cloneable, Serializable{
 
     public String getAvatar() {
         return avatar;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public User clone() {

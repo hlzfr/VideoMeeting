@@ -1,18 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
 
     <include layout="@layout/toolbar" />
 
-    <!--<FrameLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
+    <LinearLayout
+        android:id="@+id/ll_chat_input"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/edt_chat_text"
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="发送"
+            android:onClick="sendTextMessage"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_below="@+id/toolbar_wrapper"
+        android:layout_above="@+id/ll_chat_input"
+        android:id="@+id/fl_chat_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <android.opengl.GLSurfaceView
             android:id="@+id/sv_chat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    <!--</FrameLayout>-->
 
-</LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_chat_text"
+            app:reverseLayout="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+</RelativeLayout>

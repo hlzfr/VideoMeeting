@@ -2,17 +2,22 @@ package com.jb.vmeeting.mvp.presenter;
 
 import android.graphics.Point;
 import android.opengl.GLSurfaceView;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.jb.vmeeting.R;
 import com.jb.vmeeting.app.App;
+import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.view.IRoomChatView;
 import com.jb.vmeeting.page.utils.ToastUtil;
 import com.jb.vmeeting.tools.L;
+import com.jb.vmeeting.tools.account.AccountManager;
 import com.jb.vmeeting.tools.task.TaskExecutor;
 import com.jb.vmeeting.tools.webrtc.PeerConnectionParameters;
+import com.jb.vmeeting.tools.webrtc.TextMessage;
 import com.jb.vmeeting.tools.webrtc.WebRtcClient;
 
+import org.json.JSONException;
 import org.webrtc.MediaStream;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
@@ -32,6 +37,8 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
     private VideoRendererGui.ScalingType scalingType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
 
     private String mSocketAddress;
+
+    private User currentUser = AccountManager.getInstance().getAccountSession().getCurrentUser();
 
     public RoomChatPresenter(IRoomChatView view) {
         mView = view;
@@ -55,7 +62,6 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
                 50, 50, scalingType, true);
     }
 
-
     private void init() {
         if (mView == null) {
             L.w("view is null, it may be destroyed");
@@ -67,6 +73,32 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
                 true, false, displaySize.x, displaySize.y, 30, 1, VIDEO_CODEC_VP9, true, 1, AUDIO_CODEC_OPUS, true);
 
         mWebRtcClient = new WebRtcClient(this, mSocketAddress, params, VideoRendererGui.getEGLContext());
+    }
+
+    public boolean sendTextMessage(@NonNull String content) {
+        boolean sendSuccess = false;
+        if (TextUtils.isEmpty(content.trim())) {
+            sendSuccess = false;
+            ToastUtil.toast("消息不能为空");
+            return sendSuccess;
+        }
+        if (mWebRtcClient != null && mView != null) {
+            TextMessage message = new TextMessage();
+            message.setAvatar(currentUser.getAvatar());
+            message.setNickName(currentUser.getNickName());
+            message.setContent(content);
+            try {
+                mWebRtcClient.sendTextMessage2Room(mView.getRoomName(), message);
+            } catch (JSONException e) {
+                ToastUtil.toast("发送失败");
+                L.e(e);
+            }
+            mView.onReceiveTextMessage(message);
+            sendSuccess = true;
+        } else {
+            ToastUtil.toast("初始化中...");
+        }
+        return sendSuccess;
     }
 
     /**
@@ -129,6 +161,17 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
         removeRender(endPoint);
     }
 
+    @Override
+    public void onTextReceived(final TextMessage message) {
+        TaskExecutor.runTaskOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mView != null) {
+                    mView.onReceiveTextMessage(message);
+                }
+            }
+        });
+    }
 
     private void addRender(MediaStream stream, int position) {
         VideoRenderer.Callbacks render;

@@ -59,6 +59,13 @@ public abstract class ArrayAdapter<T> extends RecyclerView.Adapter<SimpleViewHol
         if (mNotifyOnChange) notifyDataSetChanged();
     }
 
+    public void add(int pos, T object) {
+        synchronized (mLock) {
+            mObjects.add(pos, object);
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+    }
+
     public void addAll(Collection<? extends T> collection) {
         synchronized (mLock) {
             mObjects.addAll(collection);
@@ -76,6 +83,13 @@ public abstract class ArrayAdapter<T> extends RecyclerView.Adapter<SimpleViewHol
     public void insert(T object, int index) {
         synchronized (mLock) {
             mObjects.add(index, object);
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+    }
+
+    public void remove(int position) {
+        synchronized (mLock) {
+            mObjects.remove(position);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }

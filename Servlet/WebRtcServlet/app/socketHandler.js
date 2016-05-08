@@ -14,6 +14,28 @@ module.exports = function(io, streams) {
         details.from = client.id;
         otherClient.emit('message', details);
     });
+	
+	client.on('message2Room', function (details) {
+      var streamList = streams.getStreams();
+      if(!streamList) {
+        return;
+      }
+	  // delete details.to;
+      details.from = client.id;
+      for(var i = 0; i < streamList.length; i++) {
+	    var stream = streamList[i];
+		if(!stream) {
+		  continue;
+		}
+        if(stream.name == details.toRoomId && stream.id != client.id) {
+		  var otherClient = io.sockets.connected[stream.id];
+          if (!otherClient) {
+            continue;
+          }
+          otherClient.emit("message", details);
+		}
+	  }
+    });
       
     client.on('readyToStream', function(options) {
       console.log('-- ' + client.id + ' is ready to stream --');

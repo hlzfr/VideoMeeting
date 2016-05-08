@@ -55,7 +55,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity android:name=".page.activity.VideoChatActivity"
-                  android:theme="@style/AppTheme.NoActionBar" />
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
 
         <activity android:name=".page.activity.RoomUpdateActivity"
                   android:label="@string/title_room_create"
