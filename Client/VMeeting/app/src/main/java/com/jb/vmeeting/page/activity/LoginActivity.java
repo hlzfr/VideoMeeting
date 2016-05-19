@@ -69,7 +69,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     @Override
     public void preLogin() {
         //TODO show login waiting view
-        ToastUtil.toast("start login...");
+        // ToastUtil.toast("start login...");
         L.d("start login...");
     }
 
@@ -79,14 +79,14 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 //        PageNavigator.getInstance().toMainActivity(this);
 //        finish();
 //        ToastUtil.toast("login success!");
-        L.d("login success.");
+        //L.d("login success.");
         PageNavigator.getInstance().toMainActivity(this);
         finish();
     }
 
     @Override
     public void onLoginFailed(String msg) {
-        ToastUtil.toast("login failed." + msg);
+        ToastUtil.toast(msg);
         L.e("login failed. " + msg);
         //TODO cancel login waiting view
     }

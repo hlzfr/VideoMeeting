@@ -86,8 +86,10 @@ public class VideoChatActivity extends BaseActivity implements IRoomChatView{
         if (id == R.id.action_room_detail) {
             PageNavigator.getInstance().toRoomDetailActivity(this, room);
             return true;
+        } else if (id == R.id.action_room_message) {
+            PageNavigator.getInstance().toSendSMSActivity(this, room);
+            return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

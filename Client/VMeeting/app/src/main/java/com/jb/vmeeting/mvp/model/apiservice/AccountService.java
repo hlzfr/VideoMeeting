@@ -22,7 +22,7 @@ public interface AccountService {
 
     @FormUrlEncoded
     @POST("account/register")
-    Call<Result<Void>> signUp(@Field("username") String username, @Field("password") String password);
+    Call<Result<Void>> signUp(@Field("username") String username, @Field("phoneNumber") String phoneNumber, @Field("password") String password);
 
     @GET("account/logout")
     Call<Result<Void>> logout();

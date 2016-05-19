@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
@@ -88,8 +89,29 @@ public final class SystemUtils {
     /**
      * 调用系统发送短信
      */
-    public static void sendSMS(Context cxt, String smsBody) {
-        Uri smsToUri = Uri.parse("smsto:");
+    public static void sendSMS(Context cxt, String smsBody, String... phoneNumbers) {
+        String smsto = "";
+        for (int i = 0; i < phoneNumbers.length; i++) {
+            smsto += phoneNumbers[i] + ";";
+        }
+//        if (TextUtils.isEmpty(smsto)) {
+//            return;
+//        }
+        Uri smsToUri = Uri.parse("smsto:" + smsto);
+        Intent intent = new Intent(Intent.ACTION_SENDTO, smsToUri);
+        intent.putExtra("sms_body", smsBody);
+        cxt.startActivity(intent);
+    }
+
+    public static void sendSMS(Context cxt, String smsBody, List<String> phoneNumbers) {
+        String smsto = "";
+        for (int i = 0; i < phoneNumbers.size(); i++) {
+            smsto += phoneNumbers.get(i) + ";";
+        }
+//        if (TextUtils.isEmpty(smsto)) {
+//            return;
+//        }
+        Uri smsToUri = Uri.parse("smsto:" + smsto);
         Intent intent = new Intent(Intent.ACTION_SENDTO, smsToUri);
         intent.putExtra("sms_body", smsBody);
         cxt.startActivity(intent);

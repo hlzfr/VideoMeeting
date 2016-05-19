@@ -21,14 +21,15 @@ public abstract class SimpleCallback<T> implements Callback<Result<T>> {
     @Override
     public void onResponse(Call<Result<T>> call, Response<Result<T>> response) {
         Result<T> result = response.body();
+        String url = call.request().url().url().toString();
         int statusCode = response.code();
         if (result != null) {
             result.statusCode = statusCode;
             if (result.success) {
-                L.i(statusCode+" success result " + result.toString());
+                L.i(url+": "+statusCode+" success result " + result.toString());
                 onSuccess(statusCode, result);
             } else {
-                L.e(statusCode+" failed result " + result.toString());
+                L.e(url+": "+statusCode+" failed result " + result.toString());
                 onFailed(statusCode, result);
             }
         } else { // result is null
@@ -41,7 +42,7 @@ public abstract class SimpleCallback<T> implements Callback<Result<T>> {
             result.code = NETCODE.RESULT.CODE_RESULT_EMPTY;
             result.statusCode = statusCode;
             result.message = errMsg;
-            L.e(statusCode+" failed result " + result.toString());
+            L.e(url+": "+statusCode+" failed result " + result.toString());
             onFailed(statusCode, result);
         }
         if (result.code == NETCODE.RESULT.CODE_LOGIN_NEED) {
@@ -51,12 +52,13 @@ public abstract class SimpleCallback<T> implements Callback<Result<T>> {
 
     @Override
     public void onFailure(Call<Result<T>> call, Throwable t) {
+        String url = call.request().url().url().toString();
         Result<T> result = new Result<>();
         result.success = false;
         result.code = NETCODE.RESULT.ERR_LOCAL;
         result.statusCode = NETCODE.STATUS.ERR_LOCAL;
         result.message = t.getMessage();
-        L.e("status code none. failed result " + result.toString());
+        L.e(url+": "+"status code none. failed result " + result.toString());
         onFailed(result.statusCode, result);
     }
 

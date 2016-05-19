@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.jb.vmeeting.R;
+import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.presenter.SignUpPresenter;
 import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.page.base.BaseActivity;
@@ -23,6 +24,7 @@ public class SignUpActivity extends BaseActivity implements ISignUpView{
 
     EditText edtPassword;
     EditText edtUsername;
+    EditText edtPhoneNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class SignUpActivity extends BaseActivity implements ISignUpView{
 
         edtUsername = findView(R.id.edt_signUp_username);
         edtPassword = findView(R.id.edt_signUp_password);
+        edtPhoneNumber = findView(R.id.edt_signUp_phone);
     }
 
     @Override
@@ -55,26 +58,34 @@ public class SignUpActivity extends BaseActivity implements ISignUpView{
         mSignUpPresenter.signUp();
     }
 
-    @Override
-    public String getUsername() {
-        return edtUsername.getText().toString();
-    }
-
+//    @Override
+//    public String getUsername() {
+//        return edtUsername.getText().toString();
+//    }
+//
     @Override
     public String getPassword() {
         return edtPassword.getText().toString();
     }
 
     @Override
+    public User getSignupUser() {
+        User user = new User();
+        user.setUsername(edtUsername.getText().toString());
+        user.setPhoneNumber(edtPhoneNumber.getText().toString());
+        return user;
+    }
+
+    @Override
     public void preSignUp() {
         //TODO show waiting
         L.d("pre sign up");
-        ToastUtil.toast("pre sign up");
+        // ToastUtil.toast("pre sign up");
     }
 
     @Override
     public void onSignUpSuccess() {
-        ToastUtil.toast("onSignUpSuccess");
+        //ToastUtil.toast("onSignUpSuccess");
         L.d("onSignUpSuccess");
         //TODO cancel login waiting view
         finish();

@@ -11,10 +11,13 @@ import com.jb.vmeeting.R;
 import com.jb.vmeeting.app.App;
 import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.model.eventbus.event.UserUpdateEvent;
+import com.jb.vmeeting.mvp.model.helper.ProgressResponseListener;
 import com.jb.vmeeting.page.base.BaseFragment;
 import com.jb.vmeeting.page.custom.CircleImageView;
 import com.jb.vmeeting.page.utils.PageNavigator;
+import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.tools.account.AccountManager;
+import com.jb.vmeeting.tools.netfile.DownloadManager;
 import com.jb.vmeeting.utils.ViewUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -85,7 +88,7 @@ public class PersonFragment extends BaseFragment implements View.OnClickListener
         }
         tvNickName.setText(nickName);
         if (!TextUtils.isEmpty(user.getAvatar())) {
-            ImageLoader.getInstance().displayImage(App.getInstance().getString(R.string.file_base_url)+user.getAvatar(), imgAvatar);
+            ImageLoader.getInstance().displayImage(App.getInstance().getString(R.string.file_base_url) + user.getAvatar(), imgAvatar);
         }
     }
 

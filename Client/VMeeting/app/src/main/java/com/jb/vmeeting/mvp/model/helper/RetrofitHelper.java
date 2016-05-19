@@ -25,6 +25,19 @@ public class RetrofitHelper {
                     .client(OKHttpHelper.getInstance().getClient())
                     .build();
         }
+
+
+//        public static final Retrofit DOWNLOAD_INSTANCE = buildDownInstance();
+//        public static Retrofit buildDownInstance (ProgressResponseListener listener) {
+//            return  new Retrofit.Builder()
+//                    .addConverterFactory(
+//                            GsonConverterFactory.create(
+//                                    new GsonBuilder().excludeFieldsWithoutExposeAnnotation() // 没有@Expose注释的属性将不会被序列化
+//                                            .create()))
+//                    .baseUrl(App.getInstance().getString(R.string.common_base_url))
+//                    .client(OKHttpHelper.getInstance().buildDownloadClient(listener))
+//                    .build();
+//        }
     }
 
     public static Retrofit getRetrofit() {
@@ -34,4 +47,12 @@ public class RetrofitHelper {
     public static <T> T createService(final Class<T> service) {
         return getRetrofit().create(service);
     }
+
+//    public static Retrofit getDownloadRetrofit(ProgressResponseListener listener) {
+//        return RetrofitHolder.buildDownInstance(listener);
+//    }
+//
+//    public static <T> T createDownloadService(final Class<T> service, ProgressResponseListener listener) {
+//        return getDownloadRetrofit(listener).create(service);
+//    }
 }

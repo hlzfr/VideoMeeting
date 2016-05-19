@@ -84,14 +84,14 @@ public abstract class ArrayAdapter<T> extends RecyclerView.Adapter<SimpleViewHol
         synchronized (mLock) {
             mObjects.add(index, object);
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) notifyItemInserted(index);
     }
 
     public void remove(int position) {
         synchronized (mLock) {
             mObjects.remove(position);
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) notifyItemRemoved(position);
     }
 
     public void remove(T object) {

@@ -75,7 +75,7 @@ public class AccountManager {
             public void onSuccess(int statusCode, Result<User> result) {
                 AccountSession.getAccountSession().setCurrentUser(result.body);
                 // post login success event
-                EventBus.getDefault().post(new LoginEvent(true, "login success", AccountSession.getAccountSession().getCurrentUser()));
+                EventBus.getDefault().post(new LoginEvent(true, "登录成功", AccountSession.getAccountSession().getCurrentUser()));
             }
 
             @Override
@@ -88,19 +88,18 @@ public class AccountManager {
     /**
      * 发起一个注册行为
      * 注册后会利用EventBus发起一个SignUpEvent
-     * @param username
-     * @param password
+     * @param user
      */
-    public void signUp(String username, String password) {
-        mAccountService.signUp(username, password).enqueue(new SimpleCallback<Void>() {
+    public void signUp(User user, String password) {
+        mAccountService.signUp(user.getUsername(), user.getPhoneNumber(), password).enqueue(new SimpleCallback<Void>() {
             @Override
             public void onSuccess(int statusCode, Result<Void> result) {
-                EventBus.getDefault().post(new SignUpEvent(true, "sign up success! "));
+                EventBus.getDefault().post(new SignUpEvent(true, "登录成功! "));
             }
 
             @Override
             public void onFailed(int statusCode, Result<Void> result) {
-                EventBus.getDefault().post(new SignUpEvent(false, "sign up failed." + result.message));
+                EventBus.getDefault().post(new SignUpEvent(false, "注册失败." + result.message));
             }
         });
     }

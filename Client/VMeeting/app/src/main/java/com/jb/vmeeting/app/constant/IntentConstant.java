@@ -13,4 +13,6 @@ public class IntentConstant {
     public static final String BUNDLE_KEY_ROOM = "room";
 
     public static final String BUNDLE_KEY_USER_LIST = "user_list";
+
+    public static final String BUNDLE_KEY_ROOM_FILE_TYPE = "room_file_type";
 }

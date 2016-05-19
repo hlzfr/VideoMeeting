@@ -28,7 +28,16 @@ public class OKHttpHelper {
     }
 
     private OkHttpClient buildClient() {
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+        OkHttpClient client = buildBaseClientBuilder().build();
+        return client;
+    }
+
+//    public OkHttpClient buildDownloadClient(ProgressResponseListener listener) {
+//        return ProgressHelper.addProgressResponseListener(buildBaseClientBuilder(), listener).build();
+//    }
+
+    private OkHttpClient.Builder buildBaseClientBuilder() {
+        return new OkHttpClient.Builder().addInterceptor(new Interceptor() {
 
             // 该拦截对返回的权限Cookie信息进行解析和保存，并在每次发起请求时带上
             @Override
@@ -49,10 +58,10 @@ public class OKHttpHelper {
                 if (cookies.size() > 0) {
                     AuthCookie authCookie = AuthCookie.parseCookie(cookies);
                     boolean resetCookie = "true".equals(response.header("resetCookie", "false"));
-                    boolean clearCookie = "true".equals(response.header("clearCookie","false"));
+                    boolean clearCookie = "true".equals(response.header("clearCookie", "false"));
                     if (savedCookies != null && !resetCookie && !clearCookie) {
                         savedCookies.updateCookie(authCookie);
-                    } else if(clearCookie){
+                    } else if (clearCookie) {
                         savedCookies = null;
                     } else {
                         savedCookies = authCookie;
@@ -61,8 +70,7 @@ public class OKHttpHelper {
                 }
                 return response;
             }
-        }).build();
-        return client;
+        });
     }
 
     private static final class SingletonHolder {

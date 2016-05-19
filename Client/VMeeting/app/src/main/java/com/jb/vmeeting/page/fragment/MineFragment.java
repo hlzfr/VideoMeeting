@@ -70,9 +70,9 @@ public class MineFragment extends SimpleListFragment<Room> {
     public boolean onItemLongClick(View view, final int position) {
         String[] choice;
         if (currentUser.getUsername().equals(getAdapter().getItem(position).getOwnerName())) {
-            choice = new String[]{"查看详情", "编辑"};
+            choice = new String[]{"查看详情", "文件列表", "编辑"};
         } else {
-            choice = new String[]{"查看详情"};
+            choice = new String[]{"查看详情", "文件列表"};
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 //        builder.setIcon(R.drawable.ic_launcher);
@@ -85,6 +85,10 @@ public class MineFragment extends SimpleListFragment<Room> {
                         PageNavigator.getInstance().toRoomDetailActivity(getActivity(), getAdapter().getItem(position));
                         break;
                     case 1:
+                        // 前往文件列表管理页面
+                        PageNavigator.getInstance().toRoomFilesActivity(getActivity(), getAdapter().getItem(position));
+                        break;
+                    case 2:
                         PageNavigator.getInstance().toRoomCreateActivity(getActivity(), getAdapter().getItem(position));
                         break;
                 }

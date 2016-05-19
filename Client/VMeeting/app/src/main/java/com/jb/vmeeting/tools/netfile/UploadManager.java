@@ -2,6 +2,8 @@ package com.jb.vmeeting.tools.netfile;
 
 import com.jb.vmeeting.mvp.model.apiservice.FileService;
 import com.jb.vmeeting.mvp.model.entity.Result;
+import com.jb.vmeeting.mvp.model.helper.ProgressHelper;
+import com.jb.vmeeting.mvp.model.helper.ProgressRequestListener;
 import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
 import com.jb.vmeeting.mvp.model.helper.SimpleCallback;
 import com.jb.vmeeting.tools.L;
@@ -41,5 +43,20 @@ public class UploadManager {
         MultipartBody requestBody = new MultipartBody.Builder().addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("media/type"), file)).setType(MediaType.parse("multipart/form-data")).build();
 
         fileService.upload(requestBody).enqueue(callback);
+    }
+
+    public void upload(String path, SimpleCallback<String> callback, ProgressRequestListener listener) {
+        upload(new File(path), callback, listener);
+    }
+
+    public void upload(File file, SimpleCallback<String> callback, ProgressRequestListener listener) {
+        if (!file.exists()) {
+            // TODO throw file not exist error
+            L.e("file not exist");
+            return;
+        }
+
+        MultipartBody requestBody = new MultipartBody.Builder().addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("media/type"), file)).setType(MediaType.parse("multipart/form-data")).build();
+        fileService.upload(ProgressHelper.addProgressRequestListener(requestBody, listener)).enqueue(callback);
     }
 }

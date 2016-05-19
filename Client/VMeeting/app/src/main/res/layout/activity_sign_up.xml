@@ -8,12 +8,20 @@
     <EditText
         android:id="@+id/edt_signUp_username"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="用户名"/>
+
+    <EditText
+        android:id="@+id/edt_signUp_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="手机号"/>
 
     <EditText
         android:id="@+id/edt_signUp_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="密码"
         android:inputType="textPassword"/>
 
     <Button

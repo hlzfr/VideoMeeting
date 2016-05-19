@@ -18,6 +18,7 @@ import com.jb.vmeeting.app.App;
 import com.jb.vmeeting.mvp.model.entity.Result;
 import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.model.eventbus.event.UserUpdateEvent;
+import com.jb.vmeeting.mvp.model.helper.ProgressRequestListener;
 import com.jb.vmeeting.mvp.model.helper.SimpleCallback;
 import com.jb.vmeeting.page.base.BaseActivity;
 import com.jb.vmeeting.page.utils.ToastUtil;
@@ -108,6 +109,7 @@ public class UserModifyActivity extends BaseActivity {
             if (editTextNickName == null) {
                 editTextNickName = new EditText(this);
             }
+            editTextNickName.setText("");
             editDialogNickName = new AlertDialog.Builder(this)
                     .setTitle("请输入")
 //                    .setIcon(android.R.drawable.ic_dialog_info)
@@ -124,9 +126,38 @@ public class UserModifyActivity extends BaseActivity {
                         }
                     })
                     .setNegativeButton("取消", null).create();
-
         }
         editDialogNickName.show();
+    }
+
+    AlertDialog editDialogPhone;
+    EditText editTextPhone;
+    public void modifyPhoneNumber(View view) {
+        if (editDialogPhone == null) {
+            if (editTextPhone == null) {
+                editTextPhone = new EditText(this);
+            }
+            editTextPhone.setText("");
+            editDialogPhone = new AlertDialog.Builder(this)
+                    .setTitle("请输入")
+//                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .setView(editTextPhone)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String newPhone = editTextPhone.getText().toString().trim();
+                            if (!TextUtils.isEmpty(newPhone) && !newPhone.equals(currentUser.getPhoneNumber()) && newPhone.trim().length() == 11) {
+                                currentUser.setPhoneNumber(newPhone);
+                                hasModified = true;
+                                updateUserInfoUI(currentUser);
+                            } else {
+                                ToastUtil.toast("请输入正确的手机号");
+                            }
+                        }
+                    })
+                    .setNegativeButton("取消", null).create();
+        }
+        editDialogPhone.show();
     }
 
     @Override
@@ -147,6 +178,11 @@ public class UserModifyActivity extends BaseActivity {
                 @Override
                 public void onFailed(int statusCode, Result<String> result) {
                     ToastUtil.toast(R.string.text_upload_failed);
+                }
+            }, new ProgressRequestListener() { // 进度提示
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    L.d("bytesWritten "+bytesWritten+";"+"contentLength "+contentLength+"; done "+done);
                 }
             });
         }

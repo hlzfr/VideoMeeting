@@ -1,7 +1,9 @@
 package com.jb.vmeeting.page.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
@@ -12,12 +14,17 @@ import com.jb.vmeeting.page.activity.ChooseParnerActivity;
 import com.jb.vmeeting.page.activity.LoginActivity;
 import com.jb.vmeeting.page.activity.MainActivity;
 import com.jb.vmeeting.page.activity.RoomDetailActivity;
+import com.jb.vmeeting.page.activity.RoomFilesActivity;
 import com.jb.vmeeting.page.activity.RoomUpdateActivity;
+import com.jb.vmeeting.page.activity.SendSMSActivity;
 import com.jb.vmeeting.page.activity.SignUpActivity;
 import com.jb.vmeeting.page.activity.UserModifyActivity;
 import com.jb.vmeeting.page.activity.VideoChatActivity;
+import com.jb.vmeeting.page.base.BaseActivity;
 import com.jb.vmeeting.tools.L;
+import com.jb.vmeeting.utils.FileUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +94,27 @@ public class PageNavigator {
         Bundle bundle = new Bundle();
         bundle.putSerializable(IntentConstant.BUNDLE_KEY_ROOM, room);
         toActivity(ctx, RoomDetailActivity.class, bundle);
+    }
+
+    public void toRoomFilesActivity(@NonNull Context ctx, @NonNull Room room) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(IntentConstant.BUNDLE_KEY_ROOM, room);
+        toActivity(ctx, RoomFilesActivity.class, bundle);
+    }
+
+    public void toSendSMSActivity(@NonNull Context ctx, @NonNull Room room) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(IntentConstant.BUNDLE_KEY_ROOM, room);
+        toActivity(ctx, SendSMSActivity.class, bundle);
+    }
+
+    public void toChooseFileForResult(@NonNull BaseActivity activity, int requestCode) {
+        FileUtils.showFileChooser(activity, requestCode);
+    }
+
+    public void toViewFile(@NonNull Context ctx, String filePath) {
+        Intent intent = FileUtils.openFile(filePath);
+        ctx.startActivity(intent);
     }
 
     private void toActivity(@NonNull Context ctx, @NonNull Class clazz) {

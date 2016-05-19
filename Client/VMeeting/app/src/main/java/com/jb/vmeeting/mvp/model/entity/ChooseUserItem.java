@@ -42,6 +42,14 @@ public class ChooseUserItem {
         return chooseUserItemPage;
     }
 
+    public static List<ChooseUserItem> toChooseUserList(@NonNull List<User> users) {
+        List<ChooseUserItem> chooseUserItems = new ArrayList<>(users.size());
+        for (User user : users) {
+            chooseUserItems.add(new ChooseUserItem(false, user));
+        }
+        return chooseUserItems;
+    }
+
     @Override
     public String toString() {
         return "isChoose=" + isChoose + ", " + (user == null ? "null" : user.toString());

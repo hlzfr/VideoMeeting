@@ -1,7 +1,11 @@
 package com.jb.vmeeting.mvp.presenter;
 
+import android.text.TextUtils;
+
+import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.mvp.model.eventbus.event.SignUpEvent;
 import com.jb.vmeeting.mvp.view.ISignUpView;
+import com.jb.vmeeting.page.utils.ToastUtil;
 import com.jb.vmeeting.tools.account.AccountManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -21,7 +25,19 @@ public class SignUpPresenter extends BasePresenter{
 
     public void signUp() {
         signUpView.preSignUp();
-        AccountManager.getInstance().signUp(signUpView.getUsername(), signUpView.getPassword());
+
+        User userInfo = signUpView.getSignupUser();
+        String password = signUpView.getPassword();
+        if (TextUtils.isEmpty(userInfo.getUsername()) || TextUtils.isEmpty(userInfo.getPhoneNumber()) || TextUtils.isEmpty(password)) {
+            ToastUtil.toast("请完整填写注册信息");
+            return;
+        }
+        if (userInfo.getPhoneNumber() != null && userInfo.getPhoneNumber().trim().length() != 11) {
+            ToastUtil.toast("手机号错误");
+            return;
+        }
+
+        AccountManager.getInstance().signUp(userInfo, password);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

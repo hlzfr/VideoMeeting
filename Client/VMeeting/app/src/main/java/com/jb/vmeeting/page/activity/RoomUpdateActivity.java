@@ -84,6 +84,9 @@ public class RoomUpdateActivity extends BaseActivity implements IUpdateRoomView 
         }
         if (room == null) {
             room = new Room();
+        } else {
+            if(getSupportActionBar()!=null)
+                getSupportActionBar().setTitle("编辑房间");
         }
         updateRoomInfoUI(room);
     }

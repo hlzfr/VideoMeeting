@@ -18,6 +18,9 @@ import com.jb.vmeeting.page.custom.CircleImageView;
 import com.jb.vmeeting.tools.L;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Jianbin on 2016/4/28.
  */
@@ -60,5 +63,18 @@ public class UserListAdapter extends ArrayAdapter<ChooseUserItem> {
             imgAvatar.setImageResource(R.mipmap.ic_launcher);
         }
         tvNickName.setText(nickName);
+    }
+
+    public List<ChooseUserItem> getSelectItem() {
+        int count = getCount();
+        List<ChooseUserItem> selected = new ArrayList<>(count);
+        ChooseUserItem item;
+        for (int i = 0; i < count; i++) {
+            item = getItem(i);
+            if (item.isChoose()) {
+                selected.add(item);
+            }
+        }
+        return selected;
     }
 }
