@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+<session-factory>
+	<property name="connection.useUnicode">true</property> 
+    <property name="connection.characterEncoding">UTF-8</property> 
+	<!-- 各属性的配置 -->
+	<property name="show_sql">true</property>
+	<property name="dialect">
+		org.hibernate.dialect.MySQLDialect
+	</property>
+	<!-- 一次读的数据库记录数 -->
+	<property name="jdbc.fetch_size">50</property>
+	<!-- 设定对数据库进行批量删除 -->
+	<property name="jdbc.batch_size">30</property>
+	<property name="myeclipse.connection.profile">
+		com.mysql.jdbc.Driver
+	</property>
+	<property name="connection.url">
+		jdbc:mysql://localhost:3306/db_vc_common
+	</property>
+	<property name="connection.username">jianbin</property>
+	<property name="connection.password">6965790</property>
+	<property name="connection.driver_class">
+		com.mysql.jdbc.Driver
+	</property>
+	<property name="hibernate.format_sql">true</property>
+	<property name="hibernate.hbm2ddl.auto">update</property>
+	<mapping class="com.vc.entity.account.Permission" />
+	<mapping class="com.vc.entity.account.Role" />
+	<mapping class="com.vc.entity.account.User" />
+	<mapping class="com.vc.entity.BaseEntity" />
+	
+</session-factory>
+</hibernate-configuration>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache name="shirocache">
+	<diskStore path="java.io.tmpdir" />
+	<defaultCache maxElementsInMemory="1000" eternal="false"
+		timeToIdleSeconds="60" timeToLiveSeconds="604800" overflowToDisk="true" />
+	<!-- 登录记录缓存 锁定10分钟 -->
+	<cache name="shiro.passwordRetryCache" eternal="false"
+		timeToIdleSeconds="600" timeToLiveSeconds="600" overflowToDisk="true">
+	</cache>
+	<cache name="shiro.authorizationCache" eternal="false"
+		timeToIdleSeconds="5" timeToLiveSeconds="20" overflowToDisk="true">
+	</cache>
+	<cache name="shiro.authenticationCache" eternal="false"
+		timeToIdleSeconds="5" timeToLiveSeconds="20" overflowToDisk="true">
+	</cache>
+	<!-- timeToIdleSeconds=超过该时间未访问此缓存失效 timeToLiveSeconds=此缓存最多存活时间 -->
+	<!-- maxEntriesLocalHeap="2000" statistics="true" timeToIdleSeconds="604800" timeToLiveSeconds="2592000"-->
+	<cache name="shiro-activeSessionCache" eternal="false"
+		timeToIdleSeconds="900" timeToLiveSeconds="1800" overflowToDisk="true">
+	</cache>
+</ehcache>
