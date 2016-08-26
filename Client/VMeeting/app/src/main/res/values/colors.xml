@@ -11,6 +11,8 @@
     <color name="bottom_bar_active">#379891</color>
     <!--<color name="bottom_bar_active">#38393e</color>-->
 
+    <color name="black">#000000</color>
+
     <color name="appBg">#eee</color>
 
     <color name="text_primary">#222</color>

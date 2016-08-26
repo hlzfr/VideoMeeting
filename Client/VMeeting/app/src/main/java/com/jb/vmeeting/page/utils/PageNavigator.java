@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.jb.vmeeting.app.constant.IntentConstant;
 import com.jb.vmeeting.mvp.model.entity.Room;
 import com.jb.vmeeting.mvp.model.entity.User;
 import com.jb.vmeeting.page.activity.ChooseParnerActivity;
+import com.jb.vmeeting.page.activity.FullScreenImageActivity;
 import com.jb.vmeeting.page.activity.LoginActivity;
 import com.jb.vmeeting.page.activity.MainActivity;
 import com.jb.vmeeting.page.activity.RoomDetailActivity;
@@ -112,9 +114,25 @@ public class PageNavigator {
         FileUtils.showFileChooser(activity, requestCode);
     }
 
+    public void toChooseImageForResult(@NonNull BaseActivity activity, int requestCode) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_PICK);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
     public void toViewFile(@NonNull Context ctx, String filePath) {
         Intent intent = FileUtils.openFile(filePath);
         ctx.startActivity(intent);
+    }
+
+    public void toFullScreenImageActivity(@NonNull Context ctx, ArrayList<String> imageUrls, int position) {
+        L.d("imageUrls " + String.valueOf(imageUrls));
+        L.d("position " + position);
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList(IntentConstant.BUNDLE_KEY_IMAGE_URLS, imageUrls);
+        bundle.putInt(IntentConstant.BUNDLE_KEY_IMAGE_POSITION, position);
+        toActivity(ctx, FullScreenImageActivity.class, bundle);
     }
 
     private void toActivity(@NonNull Context ctx, @NonNull Class clazz) {

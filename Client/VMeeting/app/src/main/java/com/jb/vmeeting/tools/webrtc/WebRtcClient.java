@@ -50,6 +50,8 @@ public class WebRtcClient {
         void onRemoveRemoteStream(int endPoint);
 
         void onTextReceived(TextMessage message);
+
+        void onPptChanged(PptControlMsg pptControlMsg);
     }
 
     /**
@@ -57,6 +59,16 @@ public class WebRtcClient {
      */
     private interface Command{
         void execute(String peerId, JSONObject payload) throws JSONException;
+    }
+
+    private class PptCommand implements Command {
+        @Override
+        public void execute(String peerId, JSONObject payload) throws JSONException {
+            PptControlMsg controlMsg = sGson.fromJson(payload.toString(), PptControlMsg.class);
+            if (mListener != null) {
+                mListener.onPptChanged(controlMsg);
+            }
+        }
     }
 
     private class CreateOfferCommand implements Command{
@@ -107,7 +119,7 @@ public class WebRtcClient {
         }
     }
 
-    private class TextCommond implements Command {
+    private class TextCommand implements Command {
 
         @Override
         public void execute(String peerId, JSONObject payload) throws JSONException {
@@ -153,8 +165,15 @@ public class WebRtcClient {
     public void sendTextMessage2Room(String roomId, TextMessage textMessage) throws JSONException {
         String payload = sGson.toJson(textMessage);
         JSONObject payloadJson = new JSONObject(payload);
-        L.d("payload "+payloadJson.toString());
+        L.d("payload " + payloadJson.toString());
         sendMessage2Room(roomId, "text", payloadJson);
+    }
+
+    public void sendPptControlMsg2Room(String roomId, PptControlMsg pptControlMsg) throws JSONException {
+        String payload = sGson.toJson(pptControlMsg);
+        JSONObject payloadJson = new JSONObject(payload);
+        L.d("payload " + payloadJson.toString());
+        sendMessage2Room(roomId, "ppt", payloadJson);
     }
 
     private class MessageHandler {
@@ -166,7 +185,8 @@ public class WebRtcClient {
             commandMap.put("offer", new CreateAnswerCommand());
             commandMap.put("answer", new SetRemoteSDPCommand());
             commandMap.put("candidate", new AddIceCandidateCommand());
-            commandMap.put("text", new TextCommond()); // 文本聊天信息
+            commandMap.put("text", new TextCommand()); // 文本聊天信息
+            commandMap.put("ppt", new PptCommand()); // 文本聊天信息
         }
 
         private Emitter.Listener onMessage = new Emitter.Listener() {

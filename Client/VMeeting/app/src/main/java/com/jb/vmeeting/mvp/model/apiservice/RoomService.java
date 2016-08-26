@@ -4,6 +4,7 @@ import com.jb.vmeeting.mvp.model.entity.Page;
 import com.jb.vmeeting.mvp.model.entity.Result;
 import com.jb.vmeeting.mvp.model.entity.Room;
 import com.jb.vmeeting.mvp.model.entity.RoomFiles;
+import com.jb.vmeeting.mvp.model.entity.RoomPpt;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -38,4 +39,11 @@ public interface RoomService {
 
     @POST("room/files/update")
     Call<Result<Void>> updateRoomFiles(@Body RoomFiles files);
+
+
+    @POST("room/ppt/getPpts")
+    Call<Result<RoomPpt>> getRoomPpts(@Body Room room);
+
+    @POST("room/ppt/update")
+    Call<Result<Void>> updateRoomPpts(@Body RoomPpt ppts);
 }

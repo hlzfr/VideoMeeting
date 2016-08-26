@@ -80,6 +80,9 @@
 
         <activity android:name=".page.activity.RoomFilesActivity"
                   android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity android:name=".page.activity.FullScreenImageActivity"
+                  android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

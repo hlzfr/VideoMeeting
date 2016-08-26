@@ -26,23 +26,34 @@
             android:onClick="sendTextMessage"/>
     </LinearLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_below="@+id/toolbar_wrapper"
         android:layout_above="@+id/ll_chat_input"
-        android:id="@+id/fl_chat_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <android.opengl.GLSurfaceView
-            android:id="@+id/sv_chat"
+        <com.jb.vmeeting.page.custom.PptViewPager
+            android:id="@+id/vp_chat_ppt"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_chat_text"
-            app:reverseLayout="true"
+        <FrameLayout
+            android:id="@+id/fl_chat_content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+            android:layout_height="match_parent">
+
+            <android.opengl.GLSurfaceView
+                android:id="@+id/sv_chat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_chat_text"
+                app:reverseLayout="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+    </LinearLayout>
 
 </RelativeLayout>

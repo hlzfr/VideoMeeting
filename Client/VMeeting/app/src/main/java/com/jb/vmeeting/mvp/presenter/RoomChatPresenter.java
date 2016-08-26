@@ -7,13 +7,22 @@ import android.text.TextUtils;
 
 import com.jb.vmeeting.R;
 import com.jb.vmeeting.app.App;
+import com.jb.vmeeting.mvp.model.apiservice.RoomService;
+import com.jb.vmeeting.mvp.model.entity.Result;
+import com.jb.vmeeting.mvp.model.entity.RoomFiles;
+import com.jb.vmeeting.mvp.model.entity.RoomPpt;
 import com.jb.vmeeting.mvp.model.entity.User;
+import com.jb.vmeeting.mvp.model.helper.ProgressRequestListener;
+import com.jb.vmeeting.mvp.model.helper.RetrofitHelper;
+import com.jb.vmeeting.mvp.model.helper.SimpleCallback;
 import com.jb.vmeeting.mvp.view.IRoomChatView;
 import com.jb.vmeeting.page.utils.ToastUtil;
 import com.jb.vmeeting.tools.L;
 import com.jb.vmeeting.tools.account.AccountManager;
+import com.jb.vmeeting.tools.netfile.UploadManager;
 import com.jb.vmeeting.tools.task.TaskExecutor;
 import com.jb.vmeeting.tools.webrtc.PeerConnectionParameters;
+import com.jb.vmeeting.tools.webrtc.PptControlMsg;
 import com.jb.vmeeting.tools.webrtc.TextMessage;
 import com.jb.vmeeting.tools.webrtc.WebRtcClient;
 
@@ -21,6 +30,8 @@ import org.json.JSONException;
 import org.webrtc.MediaStream;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
+
+import java.io.File;
 
 /**
  * 房间聊天
@@ -32,6 +43,10 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
 
     private WebRtcClient mWebRtcClient;
     private IRoomChatView mView;
+
+    private RoomPpt roomPpt;
+
+    RoomService roomService = RetrofitHelper.createService(RoomService.class);
 
     private VideoRenderer.Callbacks localRender;
     private VideoRendererGui.ScalingType scalingType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
@@ -60,6 +75,7 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
         localRender = VideoRendererGui.create(
                 0, 0,
                 50, 50, scalingType, true);
+
     }
 
     private void init() {
@@ -73,6 +89,122 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
                 true, false, displaySize.x, displaySize.y, 30, 1, VIDEO_CODEC_VP9, true, 1, AUDIO_CODEC_OPUS, true);
 
         mWebRtcClient = new WebRtcClient(this, mSocketAddress, params, VideoRendererGui.getEGLContext());
+    }
+
+    public void getPpt() {
+        if (mView == null || mView.getRoom() == null) {
+            return;
+        }
+        roomService.getRoomPpts(mView.getRoom()).enqueue(new SimpleCallback<RoomPpt>() {
+            @Override
+            public void onSuccess(int statusCode, Result<RoomPpt> result) {
+                roomPpt = result.body;
+                if (mView != null && result.body != null) {
+                    mView.onGetPpts(result.body);
+                }
+            }
+
+            @Override
+            public void onFailed(int statusCode, Result<RoomPpt> result) {
+                ToastUtil.toast("获取ppt失败:" + result.message);
+            }
+        });
+    }
+
+    boolean isStreamingFile = false;
+    public void addPpt(File file) {
+        if (isStreamingFile) {
+            return ;
+        }
+        if (mView != null) {
+            mView.onUploadStart(file);
+        }
+        isStreamingFile = true;
+        // 开始上传
+        UploadManager.getInstance().upload(file, new SimpleCallback<String>() {
+            @Override
+            public void onSuccess(int statusCode, Result<String> result) {
+                isStreamingFile = false;
+                String url = result.body;
+                roomPpt.getPpts().add(url);
+                updateRoomPpt(roomPpt); // 更新远端数据
+                if (mView != null) {
+                    PptControlMsg controlMsg = new PptControlMsg();
+                    controlMsg.type = PptControlMsg.TYPE_ADD;
+                    controlMsg.url = url;
+                    try {
+                        mWebRtcClient.sendPptControlMsg2Room(mView.getRoomName(), controlMsg);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mView.onPptAdd(url);
+                    mView.onUploadSuccess(url);
+                }
+            }
+
+            @Override
+            public void onFailed(int statusCode, Result<String> result) {
+                isStreamingFile = false;
+                if (mView != null) {
+                    mView.onUploadFailed(result.code, result.message);
+                }
+            }
+        }, new ProgressRequestListener() {
+            @Override
+            public void onRequestProgress(final long bytesWritten, final long contentLength, boolean done) {
+                if (mView != null) {
+                    TaskExecutor.runTaskOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mView.onUploading(bytesWritten, contentLength);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void movePpt(int toPosition) {
+        if (mView != null) {
+            PptControlMsg controlMsg = new PptControlMsg();
+            controlMsg.type = PptControlMsg.TYPE_MOVE;
+            controlMsg.position = toPosition;
+            try {
+                mWebRtcClient.sendPptControlMsg2Room(mView.getRoomName(), controlMsg);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void deletePpt(String url) {
+        roomPpt.getPpts().remove(url);
+        updateRoomPpt(roomPpt);
+        PptControlMsg controlMsg = new PptControlMsg();
+        controlMsg.type = PptControlMsg.TYPE_DELETE;
+        controlMsg.url = url;
+        try {
+            mWebRtcClient.sendPptControlMsg2Room(mView.getRoomName(), controlMsg);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (mView != null) {
+            mView.onPptDelete(url);
+        }
+    }
+
+    public void updateRoomPpt(RoomPpt roomPpt) {
+        roomService.updateRoomPpts(roomPpt).enqueue(new SimpleCallback<Void>() {
+            @Override
+            public void onSuccess(int statusCode, Result<Void> result) {
+                ToastUtil.toast("更新成功");
+            }
+
+            @Override
+            public void onFailed(int statusCode, Result<Void> result) {
+                ToastUtil.toast("更新失败:" + result.message);
+            }
+        });
     }
 
     public boolean sendTextMessage(@NonNull String content) {
@@ -171,6 +303,20 @@ public class RoomChatPresenter extends BasePresenter implements WebRtcClient.Rtc
                 }
             }
         });
+    }
+
+    @Override
+    public void onPptChanged(PptControlMsg pptControlMsg) {
+        if (mView == null) {
+            return;
+        }
+        if (pptControlMsg.type == PptControlMsg.TYPE_ADD) {
+            mView.onPptAdd(pptControlMsg.url);
+        } else if (pptControlMsg.type == PptControlMsg.TYPE_MOVE) {
+            mView.onPptMoved(pptControlMsg.position);
+        } else if (pptControlMsg.type == PptControlMsg.TYPE_DELETE) {
+            mView.onPptDelete(pptControlMsg.url);
+        }
     }
 
     private void addRender(MediaStream stream, int position) {
